@@ -5043,7 +5043,7 @@ jobs:
               @Test fun easy_future() { assertTrue(SrsScheduler.schedule(card(), SrsScheduler.EASY, now).dueAt > now) }
               @Test fun capped() {
                   var c = card()
-                  repeat(40) { c = SrsScheduler.schedule(c, Srscheduler.EASY, now) }
+                                   repeat(40) { c = SrsScheduler.schedule(c, Srscheduler.EASY, now) } }
                   assertTrue(c.intervalDays <= 180.0)
               }
           }
