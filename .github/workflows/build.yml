@@ -5037,13 +5037,13 @@ jobs:
               }
               @Test fun ease_floor() {
                   var c = card()
-                                    repeat(40) { c = SrsScheduler.schedule(c, SrsScheduler.EASY, now) } 
+                  repeat(40) { c = SrsScheduler.schedule(c, SrsScheduler.EASY, now) } 
                   assertTrue(c.ease >= 1.3)
               }
               @Test fun easy_future() { assertTrue(SrsScheduler.schedule(card(), SrsScheduler.EASY, now).dueAt > now) }
               @Test fun capped() {
                   var c = card()
-                                   repeat(40) { c = SrsScheduler.schedule(c, Srscheduler.EASY, now) } }
+                  repeat(40) { c = SrsScheduler.schedule(c, SrsScheduler.EASY, now) } }
                   assertTrue(c.intervalDays <= 180.0)
               }
           }
