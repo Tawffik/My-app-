@@ -10,7 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.cyberos.app.data.BrowserLauncher
 import com.cyberos.app.data.ResearchState
 import com.cyberos.app.ui.EmptyState
 import com.cyberos.app.ui.lang.Lang
@@ -18,6 +20,7 @@ import com.cyberos.app.ui.lang.Lang
 @Composable
 fun ResearchDetailScreen(state: ResearchState, id: Long, onBack: () -> Unit) {
     val item = state.items.firstOrNull { it.id == id }
+    val context = LocalContext.current
     LaunchedEffect(id) { state.markRead(id) }
 
     if (item == null) {
@@ -57,7 +60,14 @@ fun ResearchDetailScreen(state: ResearchState, id: Long, onBack: () -> Unit) {
         }
         Spacer(Modifier.height(16.dp))
         if (item.link.isNotBlank()) {
-            Text(item.link, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+            Button(
+                onClick = { BrowserLauncher.open(context, item.link) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(Lang.t("Open in Browser", "افتح في المتصفح"))
+            }
+            Spacer(Modifier.height(6.dp))
+            Text(item.link, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
