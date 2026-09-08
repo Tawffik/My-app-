@@ -28,6 +28,8 @@ import com.cyberos.app.ui.settings.SettingsScreen
 import com.cyberos.app.ui.tasks.*
 import com.cyberos.app.ui.research.*
 import com.cyberos.app.ui.bugbounty.*
+import com.cyberos.app.ui.brief.DailyBriefScreen
+import com.cyberos.app.ui.brief.DailyBriefModel
 import com.cyberos.app.ui.theme.CyberTheme
 
 @Composable
@@ -97,11 +99,13 @@ fun CyberOSApp() {
     var bbLinkedResearchId by rememberSaveable { mutableStateOf(0L) }
     var bbChecklistOpen by rememberSaveable { mutableStateOf(false) }
     var bbAssetsProgramId by rememberSaveable { mutableStateOf(0L) }
+    var briefOpen by rememberSaveable { mutableStateOf(false) }
+    var noteTemplateId by rememberSaveable { mutableStateOf("") }
 
     val overlayOpen = editingId != 0L || openTopicId.isNotEmpty() ||
         methListOpen || methOpenId != 0L || aiSettingsOpen || settingsOpen || graphOpen ||
         taskEditId != 0L || projectOpenId != 0L || searchOpen || focusOpen ||
-        cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L || bbOpen || bbFindingId != 0L || bbProgramId != 0L || bbChecklistOpen || bbAssetsProgramId != 0L
+        cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L || bbOpen || bbFindingId != 0L || bbProgramId != 0L || bbChecklistOpen || bbAssetsProgramId != 0L || briefOpen
 
     CyberTheme {
         Scaffold(
@@ -149,11 +153,25 @@ fun CyberOSApp() {
             Box(Modifier.fillMaxSize().padding(padding)) {
                 when {
                     editingId != 0L -> NoteEditScreen(
-                        note = if (editingId > 0) notesState.get(editingId) else null,
+                        note = when {
+                            editingId > 0 -> notesState.get(editingId)
+                            noteTemplateId.isNotBlank() -> {
+                                val tpl = NoteTemplates.byId(noteTemplateId)
+                                if (tpl != null) Note(
+                                    id = -1L,
+                                    title = tpl.title,
+                                    body = tpl.body,
+                                    tags = tpl.tags,
+                                    createdAt = 0L,
+                                    updatedAt = 0L
+                                ) else null
+                            }
+                            else -> null
+                        },
                         allNotes = notesState.notes,
                         onOpenNote = { id -> editingId = id },
-                        onBack = { editingId = 0L },
-                        onSave = { t, b, tg -> notesState.upsert(editingId, t, b, tg); editingId = 0L },
+                        onBack = { editingId = 0L; noteTemplateId = "" },
+                        onSave = { t, b, tg -> notesState.upsert(editingId, t, b, tg); editingId = 0L; noteTemplateId = "" },
                         onAskAi = { t, b ->
                             aiState.pendingQuestion = "حلّل الملاحظة دي أمنيًا وصحّح أي معلومة."
                             aiState.pendingContext = "Title: $t\n\nContent:\n$b"
@@ -241,7 +259,51 @@ fun CyberOSApp() {
                         onOpenSettings = { settingsOpen = true },
                         onOpenQuiz = { quizState.startMixed(); quizOpen = "mixed" },
                         onOpenChallenge = { challengeOpen = true },
-                        onOpenBugBounty = { bbOpen = true }
+                        onOpenBugBounty = { bbOpen = true },
+                        onOpenBrief = { briefOpen = true },
+                        onOpenAiTutor = {
+                            aiState.mode = ChatMode.AI_TUTOR
+                            aiMode = 0
+                            tab = 5
+                        },
+                        onOpenResearch = { tab = 6 },
+                        openFindingsCount = bugBountyState.findings.count {
+                            it.status !in listOf("Closed", "Resolved", "Duplicate", "N/A", "Submitted", "Triaged")
+                        },
+                        researchPulse = researchState.items.count {
+                            System.currentTimeMillis() - it.publishedAt < 72L * 3600_000L
+                        }
+                    )
+                    briefOpen -> DailyBriefScreen(
+                        model = DailyBriefModel(
+                            cardsDue = cardStore.countDue(System.currentTimeMillis()),
+                            streak = progressState.streak,
+                            xp = progressState.xp,
+                            nextTopic = CyberCurriculum.firstIncompleteTopic { progressState.isCompleted(it) },
+                            openFindings = bugBountyState.findings.filter {
+                                it.status !in listOf("Closed", "Resolved", "Duplicate", "N/A", "Submitted", "Triaged")
+                            },
+                            recentWriteups = researchState.items.filter {
+                                it.category == "Bug Bounty" || it.tags.contains("writeup")
+                            }.take(8),
+                            aiSecurityItems = researchState.items.filter {
+                                it.category == "AI Security" ||
+                                    it.title.contains("LLM", true) ||
+                                    it.title.contains("prompt injection", true)
+                            }.take(8)
+                        ),
+                        onBack = { briefOpen = false },
+                        onReview = { briefOpen = false; tab = 2 },
+                        onOpenTopic = { briefOpen = false; openTopicId = it },
+                        onOpenBugBounty = { briefOpen = false; bbOpen = true },
+                        onOpenResearch = { briefOpen = false; tab = 6 },
+                        onOpenAiTutor = {
+                            briefOpen = false
+                            aiState.mode = ChatMode.AI_TUTOR
+                            aiMode = 0
+                            tab = 5
+                        },
+                        onOpenNotes = { briefOpen = false; tab = 4 }
                     )
                     tab == 1 -> LearningScreen(
                         progress = progressState,
@@ -255,7 +317,11 @@ fun CyberOSApp() {
                         onOpenTask = { id -> taskEditId = id },
                         onOpenProject = { id -> projectOpenId = id }
                     )
-                    tab == 4 -> NotesScreen(state = notesState, onOpen = { id -> editingId = id })
+                    tab == 4 -> NotesScreen(
+                        state = notesState,
+                        onOpen = { id -> editingId = id },
+                        onOpenTemplate = { tid -> noteTemplateId = tid; editingId = -1L }
+                    )
                     researchOpenId != 0L -> ResearchDetailScreen(
                         state = researchState, id = researchOpenId,
                         onBack = { researchOpenId = 0L },

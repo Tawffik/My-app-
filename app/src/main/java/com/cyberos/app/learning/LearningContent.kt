@@ -430,7 +430,126 @@ object CyberCurriculum {
                     )
                 )
             )
+        ),
+
+        PathData(
+            id = "ai-security", title = "AI Security",
+            description = "LLM risks, prompt injection, RAG, agents — for authorized learning and AI-assisted bug bounty.",
+            topics = listOf(
+                TopicData(
+                    id = "llm-basics", title = "LLM Application Basics",
+                    summary = "How chat, RAG, and tool-calling apps are built — and where trust boundaries break.",
+                    sections = listOf(
+                        TopicSection("What it is", "An LLM app combines a model, a system prompt, user input, optional retrieval (RAG), and optional tools/agents."),
+                        TopicSection("Why it matters", "Security failures often come from treating model output as trusted code or treating retrieved documents as instructions."),
+                        TopicSection("Hands-on", "Draw the data flow for a simple chatbot with RAG: user → app → retriever → model → user."),
+                        TopicSection("Takeaways", "Separate instructions (system) from data (user/docs). Never grant tools more power than needed.")
+                    ),
+                    related = listOf("prompt-injection", "rag-security"),
+                    flashcards = listOf(
+                        "System vs user prompt?" to "System sets policy; user is untrusted input.",
+                        "RAG role?" to "Fetch documents to ground answers — documents are data, not commands."
+                    ),
+                    quiz = listOf(
+                        QuizQuestion("Retrieved docs should be treated as:", listOf("Trusted instructions", "Untrusted data", "System policy", "API keys"), 1, "Anything retrieved can be attacker-controlled."),
+                        QuizQuestion("Tool access on an agent increases:", listOf("Only latency", "Agency / impact of injection", "Encryption strength", "Nothing"), 1, "Excessive agency amplifies prompt injection.")
+                    )
+                ),
+                TopicData(
+                    id = "prompt-injection", title = "Prompt Injection",
+                    summary = "OWASP LLM01 — attacker text changes model behavior.",
+                    sections = listOf(
+                        TopicSection("What it is", "Direct injection is in the user message. Indirect injection hides instructions in content the model later reads (pages, tickets, RAG docs)."),
+                        TopicSection("Why it matters", "Models do not reliably separate instructions from data. This is structural, not a single filter bug."),
+                        TopicSection("Hands-on", "On a local or lab chatbot you own: try a benign instruction override and observe whether policy holds."),
+                        TopicSection("Defense ideas", "Least privilege for tools, human confirmation for sensitive actions, input/output filters, dual-model patterns, never put secrets in the system prompt."),
+                        TopicSection("Takeaways", "Assume injection is possible. Design so a successful injection cannot take high-impact actions alone.")
+                    ),
+                    related = listOf("llm-basics", "rag-security", "agent-security"),
+                    flashcards = listOf(
+                        "Direct vs indirect injection?" to "Direct = user chat; indirect = content retrieved or rendered later.",
+                        "Best primary control?" to "Limit what the model can do even if instructions are overridden."
+                    ),
+                    quiz = listOf(
+                        QuizQuestion("Indirect prompt injection often arrives via:", listOf("TLS only", "RAG docs / emails / pages", "Disk encryption", "MFA"), 1, "Untrusted content enters the context window."),
+                        QuizQuestion("Filters alone fully solve injection?", listOf("Yes always", "No — defense in depth required", "Only base64 filters", "Only rate limits"), 1, "No complete reliable separator exists today.")
+                    )
+                ),
+                TopicData(
+                    id = "rag-security", title = "RAG & Vector Security",
+                    summary = "Poisoning retrieval and treating documents as code.",
+                    sections = listOf(
+                        TopicSection("What it is", "RAG retrieves chunks from a vector store. Attackers may poison documents or exploit weak access control on the knowledge base."),
+                        TopicSection("Why it matters", "A poisoned chunk can steer answers or inject instructions for every user whose query retrieves it."),
+                        TopicSection("Hands-on", "List who can write to your knowledge sources. Prefer read-only retrieval identities."),
+                        TopicSection("Takeaways", "Harden ingestion, isolate tenants, and treat every chunk as untrusted data.")
+                    ),
+                    related = listOf("prompt-injection", "llm-basics"),
+                    flashcards = listOf(
+                        "RAG poisoning?" to "Attacker-controlled docs influence answers for other users.",
+                        "Vector store ACL?" to "Retrieval identity must not expose other tenants' data."
+                    ),
+                    quiz = listOf(
+                        QuizQuestion("Primary RAG risk is:", listOf("CSS only", "Untrusted retrieved content + over-privileged tools", "JPEG compression", "DNSSEC"), 1, "Data + agency combination is dangerous.")
+                    )
+                ),
+                TopicData(
+                    id = "agent-security", title = "Agents, Tools & Excessive Agency",
+                    summary = "When the model can call tools, injection becomes action.",
+                    sections = listOf(
+                        TopicSection("What it is", "Agents plan and call tools (HTTP, shell, tickets). Excessive agency means the model can take high-impact actions with little human control."),
+                        TopicSection("Why it matters", "A single injected instruction can trigger data exfil, destructive API calls, or privilege misuse."),
+                        TopicSection("Hands-on", "For any agent you build: allowlist tools, validate arguments, require confirmation for write/delete."),
+                        TopicSection("Takeaways", "Capability should be minimal. Logging of tool calls is mandatory for investigation.")
+                    ),
+                    related = listOf("prompt-injection", "output-handling"),
+                    flashcards = listOf(
+                        "Excessive agency?" to "Model can take high-impact actions beyond need.",
+                        "Tool argument validation?" to "Schema-check and allowlist before execution."
+                    ),
+                    quiz = listOf(
+                        QuizQuestion("Safest default for destructive tools:", listOf("Always auto-run", "Human confirmation + allowlist", "Hide errors only", "Disable HTTPS"), 1, "Keep a human in the loop for impact.")
+                    )
+                ),
+                TopicData(
+                    id = "output-handling", title = "Improper Output Handling",
+                    summary = "Model output is untrusted — XSS, SSRF, and command risks.",
+                    sections = listOf(
+                        TopicSection("What it is", "If model text is rendered as HTML, passed to a shell, or used in a URL, classic injection classes return."),
+                        TopicSection("Why it matters", "LLM output is attacker-influenced whenever inputs or RAG are attacker-influenced."),
+                        TopicSection("Hands-on", "Encode model output for the sink (HTML encode, parameter binding, URL allowlists)."),
+                        TopicSection("Takeaways", "Same rules as user input: encode for context, never eval.")
+                    ),
+                    related = listOf("agent-security", "prompt-injection"),
+                    flashcards = listOf(
+                        "Treat model output as?" to "Untrusted input to the next system.",
+                        "Markdown image risk?" to "Can trigger unexpected network requests when rendered."
+                    ),
+                    quiz = listOf(
+                        QuizQuestion("Rendering raw model HTML in a web app risks:", listOf("Only slow UI", "XSS / content injection", "Stronger crypto", "Offline mode"), 1, "Output must be encoded for HTML.")
+                    )
+                ),
+                TopicData(
+                    id = "ai-for-bug-bounty", title = "Using AI in Bug Bounty",
+                    summary = "AI accelerates analysis and reports — humans validate.",
+                    sections = listOf(
+                        TopicSection("What it is", "Use AI for recon triage, JS/API analysis, ranking hypotheses, and drafting reports after you reproduce a bug."),
+                        TopicSection("Rules", "Never submit unverified AI claims. Mark ideas as hypotheses. Stay in scope. Prefer non-destructive checks."),
+                        TopicSection("Workflow", "1) Scope sheet 2) Capture evidence 3) AI hypotheses 4) Manual proof 5) AI-assisted report from proven notes."),
+                        TopicSection("Takeaways", "AI is a force multiplier for structured work, not a replacement for judgment or proof.")
+                    ),
+                    related = listOf("prompt-injection", "llm-basics"),
+                    flashcards = listOf(
+                        "AI finding status?" to "Hypothesis until you reproduce it yourself.",
+                        "Best AI use after validation?" to "Structure the report from your evidence."
+                    ),
+                    quiz = listOf(
+                        QuizQuestion("Before submitting an AI-suggested bug you must:", listOf("Change the title font", "Manually reproduce and verify impact", "Only translate to English", "Disable 2FA"), 1, "Human verification is mandatory.")
+                    )
+                )
+            )
         )
+
     )
 
     fun findTopic(id: String): TopicData? {

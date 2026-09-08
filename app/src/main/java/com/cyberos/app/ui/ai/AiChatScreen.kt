@@ -1,7 +1,9 @@
 package com.cyberos.app.ui.ai
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,10 +45,27 @@ fun AiChatScreen(state: AiState, archiveState: ChatArchiveState, onOpenSettings:
             IconButton(onClick = onOpenSettings) { Icon(Icons.Filled.Settings, contentDescription = null) }
         }
 
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(
+            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
             ChatMode.values().forEach { m ->
-                FilterChip(selected = state.mode == m, onClick = { state.mode = m }, label = { Text(Lang.t(m.labelEn, m.labelAr), style = MaterialTheme.typography.labelSmall) })
+                FilterChip(
+                    selected = state.mode == m,
+                    onClick = { state.mode = m },
+                    label = { Text(Lang.t(m.labelEn, m.labelAr), style = MaterialTheme.typography.labelSmall) }
+                )
             }
+        }
+        if (state.mode == ChatMode.AI_TUTOR || state.mode == ChatMode.BB_COPILOT) {
+            Text(
+                if (state.mode == ChatMode.AI_TUTOR)
+                    Lang.t("Authorized learning only · OWASP LLM risks", "Authorized learning only · OWASP LLM risks")
+                else
+                    Lang.t("Hypotheses only · Human verification required", "Hypotheses only · Human verification required"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
         Spacer(Modifier.height(6.dp))
 

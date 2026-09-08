@@ -6,10 +6,12 @@ import androidx.compose.runtime.setValue
 import com.cyberos.app.ui.lang.Lang
 
 enum class ChatMode(val labelEn: String, val labelAr: String, val prompt: String) {
-    NORMAL("Normal", "عادي", Agents.CHAT_NORMAL),
-    TEACHER("Teacher", "معلّم", Agents.CHAT_TEACHER),
-    SOCRATIC("Socratic", "سقراطي", Agents.CHAT_SOCRATIC),
-    RESEARCHER("Researcher", "باحث", Agents.CHAT_RESEARCHER)
+    NORMAL("Normal", "Normal", Agents.CHAT_NORMAL),
+    TEACHER("Teacher", "Teacher", Agents.CHAT_TEACHER),
+    SOCRATIC("Socratic", "Socratic", Agents.CHAT_SOCRATIC),
+    RESEARCHER("Researcher", "Researcher", Agents.CHAT_RESEARCHER),
+    AI_TUTOR("AI Security", "AI Security", Agents.AI_SECURITY_TUTOR),
+    BB_COPILOT("BB Copilot", "BB Copilot", Agents.BB_COPILOT)
 }
 
 class AiState(

@@ -1,9 +1,11 @@
 package com.cyberos.app.ui.notes
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -19,15 +21,39 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun NotesScreen(state: NotesState, onOpen: (Long) -> Unit) {
+fun NotesScreen(
+    state: NotesState,
+    onOpen: (Long) -> Unit,
+    onOpenTemplate: (String) -> Unit = {}
+) {
     var deleteTarget by remember { mutableStateOf<Note?>(null) }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
         Spacer(Modifier.height(8.dp))
+        Text(Lang.t("Notes", "Notes"), style = MaterialTheme.typography.headlineSmall)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            Lang.t("Templates keep notes structured for learning and bounty work.", "Templates keep notes structured for learning and bounty work."),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(
+            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            NoteTemplates.ALL.forEach { tpl ->
+                AssistChip(
+                    onClick = { onOpenTemplate(tpl.id) },
+                    label = { Text(tpl.title, style = MaterialTheme.typography.labelSmall) }
+                )
+            }
+        }
+        Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = state.query, onValueChange = { state.query = it },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(Lang.t("Search...", "بحث...")) },
+            placeholder = { Text(Lang.t("Search...", "Search...")) },
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
             singleLine = true
         )
@@ -35,9 +61,16 @@ fun NotesScreen(state: NotesState, onOpen: (Long) -> Unit) {
 
         val list = state.filtered()
         if (list.isEmpty()) {
-            EmptyState(if (state.query.isBlank()) Lang.t("No notes — tap +", "مفيش — اضغط +") else Lang.t("No results", "مفيش نتائج"))
+            EmptyState(
+                if (state.query.isBlank())
+                    Lang.t("No notes yet — pick a template or tap +", "No notes yet — pick a template or tap +")
+                else Lang.t("No results", "No results")
+            )
         } else {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), contentPadding = PaddingValues(bottom = 16.dp)) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
                 items(list, key = { it.id }) { note ->
                     NoteCard(note = note, onOpen = { onOpen(note.id) }, onDelete = { deleteTarget = note })
                 }
@@ -48,16 +81,16 @@ fun NotesScreen(state: NotesState, onOpen: (Long) -> Unit) {
     if (deleteTarget != null) {
         AlertDialog(
             onDismissRequest = { deleteTarget = null },
-            title = { Text(Lang.t("Delete note?", "حذف؟")) },
-            text = { Text(Lang.t("Cannot be undone.", "نهائيًا.")) },
+            title = { Text(Lang.t("Delete note?", "Delete note?")) },
+            text = { Text(Lang.t("Cannot be undone.", "Cannot be undone.")) },
             confirmButton = {
                 TextButton(onClick = {
                     deleteTarget?.let { state.delete(it.id) }
                     deleteTarget = null
-                }) { Text(Lang.t("Delete", "حذف"), color = MaterialTheme.colorScheme.error) }
+                }) { Text(Lang.t("Delete", "Delete"), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { deleteTarget = null }) { Text(Lang.t("Cancel", "إلغاء")) }
+                TextButton(onClick = { deleteTarget = null }) { Text(Lang.t("Cancel", "Cancel")) }
             }
         )
     }
@@ -65,28 +98,18 @@ fun NotesScreen(state: NotesState, onOpen: (Long) -> Unit) {
 
 @Composable
 private fun NoteCard(note: Note, onOpen: () -> Unit, onDelete: () -> Unit) {
-    val dateText = remember(note.updatedAt) {
-        SimpleDateFormat("d MMM yyyy", Locale.getDefault()).format(Date(note.updatedAt))
-    }
-    val preview = remember(note.body) { WikiLinks.stripForPreview(note.body) }
-
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.clickable(onClick = onOpen).padding(14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(note.title.ifBlank { "Untitled" }, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                IconButton(onClick = onDelete) { Icon(Icons.Filled.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) }
-            }
-            if (preview.isNotBlank()) {
-                Spacer(Modifier.height(4.dp))
-                Text(preview, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            }
-            Spacer(Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                note.tags.take(4).forEach { t ->
-                    Text("#$t", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+    val fmt = remember { SimpleDateFormat("yyyy-MM-dd", Locale.US) }
+    Card(Modifier.fillMaxWidth().clickable(onClick = onOpen)) {
+        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(note.title.ifBlank { "Untitled" }, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (note.tags.isNotEmpty()) {
+                    Text(note.tags.joinToString(" · "), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
                 }
-                Spacer(Modifier.weight(1f))
-                Text(dateText, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(fmt.format(Date(note.updatedAt)), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Filled.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
             }
         }
     }

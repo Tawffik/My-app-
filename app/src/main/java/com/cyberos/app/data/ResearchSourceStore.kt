@@ -69,7 +69,11 @@ class ResearchSourceStore(context: Context) {
             "Tier2",
             "Bug Bounty"
         ),
-        ResearchSource(7, "Medium BugBountyWriteup", "https://medium.com/feed/tag/bugbountywriteup", "RSS", true, "Tier2", "Bug Bounty")
+        ResearchSource(7, "Medium BugBountyWriteup", "https://medium.com/feed/tag/bugbountywriteup", "RSS", true, "Tier2", "Bug Bounty"),
+        ResearchSource(8, "NVIDIA Developer Cybersecurity", "https://developer.nvidia.com/blog/tag/cybersecurity/feed/", "RSS", true, "Tier1", "AI Security"),
+        ResearchSource(9, "Simon Willison", "https://simonwillison.net/atom/everything/", "RSS", true, "Tier1", "AI Security"),
+        ResearchSource(10, "Google Project Zero", "https://googleprojectzero.blogspot.com/feeds/posts/default", "RSS", true, "Tier1", "Vulnerabilities"),
+        ResearchSource(11, "Krebs on Security", "https://krebsonsecurity.com/feed/", "RSS", true, "Tier2", "Threat Intelligence")
     )
 
     private fun toJson(): String {

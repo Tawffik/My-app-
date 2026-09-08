@@ -11,8 +11,8 @@ android {
         applicationId = "com.cyberos.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 30
-        versionName = "1.0.30"
+        versionCode = 31
+        versionName = "1.0.31"
     }
 
     buildTypes {

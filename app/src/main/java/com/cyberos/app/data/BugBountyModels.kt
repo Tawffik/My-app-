@@ -114,6 +114,23 @@ object BugBountyChecklists {
                 Item("a7", "Injection in parameters"),
                 Item("a8", "GraphQL introspection / batching if applicable")
             )
+        ),
+
+        Template(
+            "llm-app",
+            "LLM App Checklist",
+            listOf(
+                Item("l1", "Map system prompt vs user input boundary"),
+                Item("l2", "Identify RAG / knowledge sources and who can write them"),
+                Item("l3", "List tools/actions the model can invoke"),
+                Item("l4", "Test direct prompt injection (authorized lab only)"),
+                Item("l5", "Test indirect injection via retrieved content"),
+                Item("l6", "Verify destructive actions need human confirmation"),
+                Item("l7", "Encode model output for HTML / command / URL sinks"),
+                Item("l8", "Check secrets are not in prompts or logs"),
+                Item("l9", "Rate-limit and budget for unbounded consumption"),
+                Item("l10", "Document residual risk and monitoring")
+            )
         )
     )
 }
