@@ -19,7 +19,7 @@ import com.cyberos.app.ui.lang.Lang
 data class DailyBriefModel(
     val cardsDue: Int,
     val streak: Int,
-    val xp: Int,
+    val xp: Long,
     val nextTopic: TopicData?,
     val openFindings: List<BugBountyFinding>,
     val recentWriteups: List<ResearchItem>,
