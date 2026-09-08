@@ -49,6 +49,12 @@ object BugBountyFilters {
             "rce", "remote code execution", "command injection", "os command",
             "arbitrary code", "code execution"
         ),
+        "OAuth" to listOf(
+            "oauth", "openid", "redirect_uri", "authorization code"
+        ),
+        "JWT" to listOf(
+            "jwt", "json web token", "algorithm confusion", "none algorithm"
+        ),
         "Auth" to listOf(
             "authentication bypass", "auth bypass", "login bypass", "password reset",
             "account takeover", "ato ", "session fixation", "mfa bypass", "2fa bypass",
@@ -82,12 +88,6 @@ object BugBountyFilters {
         "Cloud Misconfig" to listOf(
             "s3 bucket", "cloud misconfig", "public bucket", "iam misconfig",
             "exposed secrets", "credential leak", "api key leak"
-        ),
-        "OAuth" to listOf(
-            "oauth", "openid", "redirect_uri", "authorization code"
-        ),
-        "JWT" to listOf(
-            "jwt", "json web token", "algorithm confusion", "none algorithm"
         ),
         "GraphQL" to listOf(
             "graphql", "introspection", "batching attack"
