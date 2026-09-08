@@ -1,5 +1,6 @@
 package com.cyberos.app.data
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,8 +9,11 @@ import com.cyberos.app.ui.lang.Lang
 class ResearchState(
     private val itemStore: ResearchItemStore,
     private val sourceStore: ResearchSourceStore,
-    private val fetcher: ResearchFetcher
+    private val fetcher: ResearchFetcher,
+    context: Context
 ) {
+    private val syncPrefs = ResearchSyncPrefs(context.applicationContext)
+
     var items by mutableStateOf(itemStore.all())
         private set
     var category by mutableStateOf("All")
@@ -18,9 +22,12 @@ class ResearchState(
     var refreshing by mutableStateOf(false)
         private set
     var lastError by mutableStateOf<String?>(null)
+    var lastSyncAt by mutableStateOf(syncPrefs.lastSuccessAt())
+        private set
 
     fun refresh() {
         items = itemStore.all()
+        lastSyncAt = syncPrefs.lastSuccessAt()
     }
 
     suspend fun fetchLatest() {
@@ -28,7 +35,8 @@ class ResearchState(
         refreshing = true
         lastError = null
         try {
-            fetcher.refreshAll()
+            val added = fetcher.refreshAll()
+            syncPrefs.markSuccess(added)
             refresh()
         } catch (_: Exception) {
             lastError = Lang.t(
@@ -37,6 +45,15 @@ class ResearchState(
             )
         } finally {
             refreshing = false
+        }
+    }
+
+    /** Pull if never synced or last success older than [maxAgeMs]. */
+    suspend fun fetchIfStale(maxAgeMs: Long = ResearchSyncPrefs.DEFAULT_STALE_MS) {
+        if (syncPrefs.isStale(maxAgeMs) || items.isEmpty()) {
+            fetchLatest()
+        } else {
+            refresh()
         }
     }
 

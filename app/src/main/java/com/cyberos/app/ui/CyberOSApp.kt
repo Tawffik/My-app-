@@ -56,7 +56,7 @@ fun CyberOSApp() {
     val researchItemStore = remember { ResearchItemStore(appCtx) }
     val researchSourceStore = remember { ResearchSourceStore(appCtx).also { it.ensureSeeded() } }
     val researchFetcher = remember { ResearchFetcher(researchSourceStore, researchItemStore) }
-    val researchState = remember { ResearchState(researchItemStore, researchSourceStore, researchFetcher) }
+    val researchState = remember { ResearchState(researchItemStore, researchSourceStore, researchFetcher, appCtx) }
 
     aiState.ragSource = { notesState.notes }
 

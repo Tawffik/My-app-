@@ -11,8 +11,8 @@ android {
         applicationId = "com.cyberos.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 24
-        versionName = "1.0.24"
+        versionCode = 28
+        versionName = "1.0.28"
     }
 
     buildTypes {
@@ -61,6 +61,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("androidx.browser:browser:1.8.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     testImplementation("junit:junit:4.13.2")

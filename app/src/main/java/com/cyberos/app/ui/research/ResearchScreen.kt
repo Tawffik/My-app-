@@ -28,7 +28,7 @@ import java.util.Locale
 @Composable
 fun ResearchScreen(state: ResearchState, onOpenItem: (Long) -> Unit) {
     val scope = rememberCoroutineScope()
-    LaunchedEffect(Unit) { if (state.items.isEmpty()) state.fetchLatest() }
+    LaunchedEffect(Unit) { state.fetchIfStale() }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
         Spacer(Modifier.height(8.dp))
@@ -48,6 +48,20 @@ fun ResearchScreen(state: ResearchState, onOpenItem: (Long) -> Unit) {
                     Icon(Icons.Filled.Refresh, contentDescription = null)
                 }
             }
+        }
+        if (state.lastSyncAt > 0L) {
+            val ago = remember(state.lastSyncAt) {
+                val mins = ((System.currentTimeMillis() - state.lastSyncAt) / 60000L).toInt()
+                when {
+                    mins < 1 -> Lang.t("Updated just now", "تم التحديث الآن")
+                    mins < 60 -> Lang.t("Updated $mins min ago", "تم التحديث منذ $mins د")
+                    else -> {
+                        val h = mins / 60
+                        Lang.t("Updated ${h}h ago", "تم التحديث منذ $h س")
+                    }
+                }
+            }
+            Text(ago, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Spacer(Modifier.height(8.dp))
 
