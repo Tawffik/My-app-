@@ -18,7 +18,7 @@ import com.cyberos.app.ui.EmptyState
 import com.cyberos.app.ui.lang.Lang
 
 @Composable
-fun ResearchDetailScreen(state: ResearchState, id: Long, onBack: () -> Unit) {
+fun ResearchDetailScreen(state: ResearchState, id: Long, onBack: () -> Unit, onAddFinding: ((title: String, vuln: String, researchId: Long) -> Unit)? = null) {
     val item = state.items.firstOrNull { it.id == id }
     val context = LocalContext.current
     LaunchedEffect(id) { state.markRead(id) }
@@ -87,6 +87,21 @@ fun ResearchDetailScreen(state: ResearchState, id: Long, onBack: () -> Unit) {
             }
         }
         Spacer(Modifier.height(16.dp))
+        if (onAddFinding != null) {
+            OutlinedButton(
+                onClick = {
+                    onAddFinding(
+                        item.title,
+                        item.vulnerabilityType.ifBlank { "Other" },
+                        item.id
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(Lang.t("Add Finding", "Add Finding"))
+            }
+            Spacer(Modifier.height(8.dp))
+        }
         if (item.link.isNotBlank()) {
             Button(
                 onClick = { BrowserLauncher.open(context, item.link) },

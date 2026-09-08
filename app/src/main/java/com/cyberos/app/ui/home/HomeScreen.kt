@@ -24,7 +24,8 @@ fun HomeScreen(
     onOpenTopic: (String) -> Unit, onGoReview: () -> Unit, onGoNotes: () -> Unit,
     onOpenMethodologies: () -> Unit, onOpenSearch: () -> Unit,
     onOpenFocus: () -> Unit, onOpenSettings: () -> Unit,
-    onOpenQuiz: () -> Unit, onOpenChallenge: () -> Unit
+    onOpenQuiz: () -> Unit, onOpenChallenge: () -> Unit,
+    onOpenBugBounty: () -> Unit = {}
 ) {
     LaunchedEffect(Unit) { progress.touchDay() }
     val hour = remember { LocalTime.now().hour }
@@ -117,6 +118,10 @@ fun HomeScreen(
             Button(onClick = onGoReview, modifier = Modifier.weight(1f)) { Text(Lang.t("Review", "مراجعة")) }
             OutlinedButton(onClick = onOpenMethodologies, modifier = Modifier.weight(1f)) { Text(Lang.t("Methods", "منهجيات")) }
             OutlinedButton(onClick = onGoNotes, modifier = Modifier.weight(1f)) { Text(Lang.t("Notes", "ملاحظات")) }
+        }
+        Spacer(Modifier.height(8.dp))
+        Button(onClick = onOpenBugBounty, modifier = Modifier.fillMaxWidth()) {
+            Text(Lang.t("Bug Bounty Workspace", "Bug Bounty Workspace"))
         }
     }
 }

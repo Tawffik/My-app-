@@ -27,6 +27,7 @@ import com.cyberos.app.ui.search.SearchScreen
 import com.cyberos.app.ui.settings.SettingsScreen
 import com.cyberos.app.ui.tasks.*
 import com.cyberos.app.ui.research.*
+import com.cyberos.app.ui.bugbounty.*
 import com.cyberos.app.ui.theme.CyberTheme
 
 @Composable
@@ -57,6 +58,9 @@ fun CyberOSApp() {
     val researchSourceStore = remember { ResearchSourceStore(appCtx).also { it.ensureSeeded() } }
     val researchFetcher = remember { ResearchFetcher(researchSourceStore, researchItemStore) }
     val researchState = remember { ResearchState(researchItemStore, researchSourceStore, researchFetcher, appCtx) }
+    val bbProgramStore = remember { BugBountyProgramStore(appCtx) }
+    val bbFindingStore = remember { BugBountyFindingStore(appCtx) }
+    val bugBountyState = remember { BugBountyState(bbProgramStore, bbFindingStore) }
 
     aiState.ragSource = { notesState.notes }
 
@@ -83,11 +87,17 @@ fun CyberOSApp() {
     var quizOpen by rememberSaveable { mutableStateOf<String?>(null) }
     var challengeOpen by rememberSaveable { mutableStateOf(false) }
     var researchOpenId by rememberSaveable { mutableStateOf(0L) }
+    var bbOpen by rememberSaveable { mutableStateOf(false) }
+    var bbFindingId by rememberSaveable { mutableStateOf(0L) }
+    var bbProgramId by rememberSaveable { mutableStateOf(0L) }
+    var bbPrefillTitle by rememberSaveable { mutableStateOf("") }
+    var bbPrefillVuln by rememberSaveable { mutableStateOf("") }
+    var bbLinkedResearchId by rememberSaveable { mutableStateOf(0L) }
 
     val overlayOpen = editingId != 0L || openTopicId.isNotEmpty() ||
         methListOpen || methOpenId != 0L || aiSettingsOpen || settingsOpen || graphOpen ||
         taskEditId != 0L || projectOpenId != 0L || searchOpen || focusOpen ||
-        cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L
+        cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L || bbOpen || bbFindingId != 0L || bbProgramId != 0L
 
     CyberTheme {
         Scaffold(
@@ -226,7 +236,8 @@ fun CyberOSApp() {
                         onOpenFocus = { focusOpen = true },
                         onOpenSettings = { settingsOpen = true },
                         onOpenQuiz = { quizState.startMixed(); quizOpen = "mixed" },
-                        onOpenChallenge = { challengeOpen = true }
+                        onOpenChallenge = { challengeOpen = true },
+                        onOpenBugBounty = { bbOpen = true }
                     )
                     tab == 1 -> LearningScreen(
                         progress = progressState,
@@ -243,7 +254,41 @@ fun CyberOSApp() {
                     tab == 4 -> NotesScreen(state = notesState, onOpen = { id -> editingId = id })
                     researchOpenId != 0L -> ResearchDetailScreen(
                         state = researchState, id = researchOpenId,
-                        onBack = { researchOpenId = 0L }
+                        onBack = { researchOpenId = 0L },
+                        onAddFinding = { title, vuln, rid ->
+                            researchOpenId = 0L
+                            bbPrefillTitle = title
+                            bbPrefillVuln = vuln
+                            bbLinkedResearchId = rid
+                            bbFindingId = -1L
+                        }
+                    )
+                    bbFindingId != 0L -> FindingEditScreen(
+                        state = bugBountyState,
+                        findingId = bbFindingId,
+                        prefillTitle = bbPrefillTitle,
+                        prefillVuln = bbPrefillVuln,
+                        linkedResearchId = bbLinkedResearchId,
+                        onBack = {
+                            bbFindingId = 0L
+                            bbPrefillTitle = ""
+                            bbPrefillVuln = ""
+                            bbLinkedResearchId = 0L
+                            bbOpen = true
+                        }
+                    )
+                    bbProgramId != 0L -> ProgramEditScreen(
+                        state = bugBountyState,
+                        programId = bbProgramId,
+                        onBack = { bbProgramId = 0L; bbOpen = true }
+                    )
+                    bbOpen -> BugBountyScreen(
+                        state = bugBountyState,
+                        onBack = { bbOpen = false },
+                        onOpenFinding = { id -> bbOpen = false; bbFindingId = id },
+                        onNewFinding = { bbOpen = false; bbFindingId = -1L },
+                        onOpenProgram = { id -> bbOpen = false; bbProgramId = id },
+                        onNewProgram = { bbOpen = false; bbProgramId = -1L }
                     )
                     tab == 6 -> ResearchScreen(
                         state = researchState,
