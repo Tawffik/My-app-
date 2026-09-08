@@ -30,7 +30,9 @@ fun BugBountyScreen(
     onOpenFinding: (Long) -> Unit,
     onNewFinding: () -> Unit,
     onOpenProgram: (Long) -> Unit,
-    onNewProgram: () -> Unit
+    onNewProgram: () -> Unit,
+    onOpenChecklists: () -> Unit = {},
+    onOpenAssets: (Long) -> Unit = {}
 ) {
     var section by remember { mutableStateOf(0) } // 0 findings, 1 programs
 
@@ -59,13 +61,18 @@ fun BugBountyScreen(
                 onClick = { section = 1 },
                 label = { Text(Lang.t("Programs", "Programs")) }
             )
+            FilterChip(
+                selected = false,
+                onClick = onOpenChecklists,
+                label = { Text(Lang.t("Checklists", "Checklists")) }
+            )
         }
         Spacer(Modifier.height(8.dp))
 
         if (section == 0) {
             FindingsList(state, onOpenFinding)
         } else {
-            ProgramsList(state, onOpenProgram)
+            ProgramsList(state, onOpenProgram, onOpenAssets)
         }
     }
 }
@@ -149,7 +156,7 @@ private fun FindingCard(f: BugBountyFinding, programName: String, onClick: () ->
 }
 
 @Composable
-private fun ProgramsList(state: BugBountyState, onOpen: (Long) -> Unit) {
+private fun ProgramsList(state: BugBountyState, onOpen: (Long) -> Unit, onOpenAssets: (Long) -> Unit) {
     if (state.programs.isEmpty()) {
         EmptyState(
             Lang.t(
@@ -164,13 +171,25 @@ private fun ProgramsList(state: BugBountyState, onOpen: (Long) -> Unit) {
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         items(state.programs, key = { it.id }) { p ->
-            ProgramCard(p, findingCount = state.findings.count { it.programId == p.id }, onClick = { onOpen(p.id) })
+            ProgramCard(
+                p,
+                findingCount = state.findings.count { it.programId == p.id },
+                assetCount = state.assets.count { it.programId == p.id },
+                onClick = { onOpen(p.id) },
+                onAssets = { onOpenAssets(p.id) }
+            )
         }
     }
 }
 
 @Composable
-private fun ProgramCard(p: BugBountyProgram, findingCount: Int, onClick: () -> Unit) {
+private fun ProgramCard(
+    p: BugBountyProgram,
+    findingCount: Int,
+    assetCount: Int,
+    onClick: () -> Unit,
+    onAssets: () -> Unit
+) {
     Card(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Column(Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -183,7 +202,8 @@ private fun ProgramCard(p: BugBountyProgram, findingCount: Int, onClick: () -> U
             Text(
                 listOfNotNull(
                     p.platform.ifBlank { null },
-                    "$findingCount findings"
+                    "$findingCount findings",
+                    "$assetCount assets"
                 ).joinToString(" · "),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -192,6 +212,8 @@ private fun ProgramCard(p: BugBountyProgram, findingCount: Int, onClick: () -> U
                 Spacer(Modifier.height(4.dp))
                 Text(p.scopeSummary, style = MaterialTheme.typography.labelSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
+            Spacer(Modifier.height(6.dp))
+            TextButton(onClick = onAssets) { Text(Lang.t("Assets", "Assets")) }
         }
     }
 }

@@ -156,11 +156,14 @@ class BugBountyFindingStore(context: Context) {
 
 class BugBountyState(
     private val programStore: BugBountyProgramStore,
-    private val findingStore: BugBountyFindingStore
+    private val findingStore: BugBountyFindingStore,
+    private val assetStore: BugBountyAssetStore
 ) {
     var programs by mutableStateOf(programStore.all())
         private set
     var findings by mutableStateOf(findingStore.all())
+        private set
+    var assets by mutableStateOf(assetStore.all())
         private set
     var statusFilter by mutableStateOf("All")
     var vulnFilter by mutableStateOf("All")
@@ -169,6 +172,7 @@ class BugBountyState(
     fun refresh() {
         programs = programStore.all()
         findings = findingStore.all()
+        assets = assetStore.all()
     }
 
     fun upsertProgram(
@@ -237,6 +241,44 @@ class BugBountyState(
     fun programName(id: Long): String =
         if (id <= 0L) "" else programs.firstOrNull { it.id == id }?.name ?: ""
 
+
+    fun assetsFor(programId: Long): List<BugBountyAsset> = assetStore.forProgram(programId)
+
+    fun upsertAsset(
+        id: Long,
+        programId: Long,
+        value: String,
+        type: String,
+        notes: String,
+        inScope: Boolean
+    ): Long {
+        val realId = if (id > 0) id else assetStore.nextId()
+        val existing = if (id > 0) assetStore.get(id) else null
+        assetStore.save(
+            BugBountyAsset(
+                id = realId,
+                programId = programId,
+                value = value.trim(),
+                type = type,
+                notes = notes.trim(),
+                inScope = inScope,
+                createdAt = existing?.createdAt ?: System.currentTimeMillis()
+            )
+        )
+        refresh()
+        return realId
+    }
+
+    fun deleteAsset(id: Long) {
+        assetStore.delete(id)
+        refresh()
+    }
+
+    fun reportMarkdown(findingId: Long): String {
+        val f = findingStore.get(findingId) ?: return ""
+        return BugBountyReportGenerator.toMarkdown(f, programName(f.programId))
+    }
+
     companion object {
         val STATUS_FILTERS = listOf("All") + FindingStatuses.ALL
         val PLATFORMS = listOf(
@@ -244,4 +286,83 @@ class BugBountyState(
             "Synack", "Private", "VDP", "Other"
         )
     }
+}
+
+class BugBountyAssetStore(context: Context) {
+    private val file = File(context.filesDir, "bb_assets.json")
+    private var cache: MutableList<BugBountyAsset> = load()
+
+    fun all(): List<BugBountyAsset> = cache.sortedByDescending { it.createdAt }
+    fun forProgram(programId: Long): List<BugBountyAsset> =
+        cache.filter { it.programId == programId }.sortedBy { it.value.lowercase() }
+    fun get(id: Long): BugBountyAsset? = cache.firstOrNull { it.id == id }
+    fun nextId(): Long = (cache.maxOfOrNull { it.id } ?: 0L) + 1L
+
+    @Synchronized
+    fun save(a: BugBountyAsset) {
+        val i = cache.indexOfFirst { it.id == a.id }
+        if (i >= 0) cache[i] = a else cache.add(a)
+        persist()
+    }
+
+    @Synchronized
+    fun delete(id: Long) {
+        cache.removeAll { it.id == id }
+        persist()
+    }
+
+    private fun persist() {
+        try {
+            val arr = JSONArray()
+            cache.forEach { a ->
+                arr.put(JSONObject().apply {
+                    put("id", a.id); put("programId", a.programId); put("value", a.value)
+                    put("type", a.type); put("notes", a.notes); put("inScope", a.inScope)
+                    put("createdAt", a.createdAt)
+                })
+            }
+            file.writeText(arr.toString())
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun load(): MutableList<BugBountyAsset> {
+        if (!file.exists()) return mutableListOf()
+        return try {
+            val arr = JSONArray(file.readText())
+            val out = mutableListOf<BugBountyAsset>()
+            for (i in 0 until arr.length()) {
+                val o = arr.getJSONObject(i)
+                out.add(
+                    BugBountyAsset(
+                        o.getLong("id"),
+                        o.optLong("programId"),
+                        o.optString("value"),
+                        o.optString("type", "Domain"),
+                        o.optString("notes"),
+                        o.optBoolean("inScope", true),
+                        o.optLong("createdAt")
+                    )
+                )
+            }
+            out
+        } catch (_: Exception) {
+            mutableListOf()
+        }
+    }
+}
+
+/** Tracks checked items per checklist template (program-scoped optional). */
+class ChecklistProgressStore(context: Context) {
+    private val prefs = context.getSharedPreferences("bb_checklists", Context.MODE_PRIVATE)
+
+    fun isChecked(templateId: String, itemId: String): Boolean =
+        prefs.getBoolean("$templateId::$itemId", false)
+
+    fun setChecked(templateId: String, itemId: String, checked: Boolean) {
+        prefs.edit().putBoolean("$templateId::$itemId", checked).apply()
+    }
+
+    fun checkedCount(templateId: String, items: List<BugBountyChecklists.Item>): Int =
+        items.count { isChecked(templateId, it.id) }
 }

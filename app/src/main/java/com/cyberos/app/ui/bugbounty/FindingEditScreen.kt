@@ -10,7 +10,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import android.widget.Toast
 import com.cyberos.app.data.BugBountyFilters
 import com.cyberos.app.data.BugBountyFinding
 import com.cyberos.app.data.BugBountyState
@@ -161,6 +165,8 @@ fun FindingEditScreen(
         OutlinedTextField(value = evidence, onValueChange = { evidence = it }, label = { Text("Evidence notes") }, modifier = Modifier.fillMaxWidth(), minLines = 3)
         Spacer(Modifier.height(16.dp))
 
+        val clipboard = LocalClipboardManager.current
+        val ctx = LocalContext.current
         Button(
             onClick = {
                 if (title.isBlank()) return@Button
@@ -192,6 +198,22 @@ fun FindingEditScreen(
         ) {
             Text(Lang.t("Save Finding", "Save Finding"))
         }
+        if (findingId > 0) {
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = {
+                    val md = state.reportMarkdown(findingId)
+                    if (md.isNotBlank()) {
+                        clipboard.setText(AnnotatedString(md))
+                        Toast.makeText(ctx, Lang.t("Report copied as Markdown", "Report copied as Markdown"), Toast.LENGTH_SHORT).show()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(Lang.t("Copy Markdown Report", "Copy Markdown Report"))
+            }
+        }
+        Spacer(Modifier.height(24.dp))
     }
 
     if (showDelete) {

@@ -60,7 +60,9 @@ fun CyberOSApp() {
     val researchState = remember { ResearchState(researchItemStore, researchSourceStore, researchFetcher, appCtx) }
     val bbProgramStore = remember { BugBountyProgramStore(appCtx) }
     val bbFindingStore = remember { BugBountyFindingStore(appCtx) }
-    val bugBountyState = remember { BugBountyState(bbProgramStore, bbFindingStore) }
+    val bbAssetStore = remember { BugBountyAssetStore(appCtx) }
+    val bugBountyState = remember { BugBountyState(bbProgramStore, bbFindingStore, bbAssetStore) }
+    val checklistProgress = remember { ChecklistProgressStore(appCtx) }
 
     aiState.ragSource = { notesState.notes }
 
@@ -93,11 +95,13 @@ fun CyberOSApp() {
     var bbPrefillTitle by rememberSaveable { mutableStateOf("") }
     var bbPrefillVuln by rememberSaveable { mutableStateOf("") }
     var bbLinkedResearchId by rememberSaveable { mutableStateOf(0L) }
+    var bbChecklistOpen by rememberSaveable { mutableStateOf(false) }
+    var bbAssetsProgramId by rememberSaveable { mutableStateOf(0L) }
 
     val overlayOpen = editingId != 0L || openTopicId.isNotEmpty() ||
         methListOpen || methOpenId != 0L || aiSettingsOpen || settingsOpen || graphOpen ||
         taskEditId != 0L || projectOpenId != 0L || searchOpen || focusOpen ||
-        cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L || bbOpen || bbFindingId != 0L || bbProgramId != 0L
+        cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L || bbOpen || bbFindingId != 0L || bbProgramId != 0L || bbChecklistOpen || bbAssetsProgramId != 0L
 
     CyberTheme {
         Scaffold(
@@ -282,13 +286,24 @@ fun CyberOSApp() {
                         programId = bbProgramId,
                         onBack = { bbProgramId = 0L; bbOpen = true }
                     )
+                    bbChecklistOpen -> ChecklistScreen(
+                        progressStore = checklistProgress,
+                        onBack = { bbChecklistOpen = false; bbOpen = true }
+                    )
+                    bbAssetsProgramId != 0L -> AssetsScreen(
+                        state = bugBountyState,
+                        programId = bbAssetsProgramId,
+                        onBack = { bbAssetsProgramId = 0L; bbOpen = true }
+                    )
                     bbOpen -> BugBountyScreen(
                         state = bugBountyState,
                         onBack = { bbOpen = false },
                         onOpenFinding = { id -> bbOpen = false; bbFindingId = id },
                         onNewFinding = { bbOpen = false; bbFindingId = -1L },
                         onOpenProgram = { id -> bbOpen = false; bbProgramId = id },
-                        onNewProgram = { bbOpen = false; bbProgramId = -1L }
+                        onNewProgram = { bbOpen = false; bbProgramId = -1L },
+                        onOpenChecklists = { bbOpen = false; bbChecklistOpen = true },
+                        onOpenAssets = { pid -> bbOpen = false; bbAssetsProgramId = pid }
                     )
                     tab == 6 -> ResearchScreen(
                         state = researchState,

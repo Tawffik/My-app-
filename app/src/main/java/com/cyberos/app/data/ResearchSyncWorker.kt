@@ -26,6 +26,15 @@ class ResearchSyncWorker(
             val fetcher = ResearchFetcher(sourceStore, itemStore)
             val added = fetcher.refreshAll()
             ResearchSyncPrefs(applicationContext).markSuccess(added)
+            if (added > 0) {
+                CyberNotifier.show(
+                    applicationContext,
+                    CyberNotificationChannels.RESEARCH,
+                    2001,
+                    "New research available",
+                    "$added new item(s) pulled into CyberOS Research."
+                )
+            }
             Result.success()
         } catch (_: Exception) {
             Result.retry()

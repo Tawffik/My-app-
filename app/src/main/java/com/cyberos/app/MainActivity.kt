@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.cyberos.app.data.ResearchSyncWorker
+import com.cyberos.app.data.DailyDigestWorker
+import com.cyberos.app.data.CyberNotificationChannels
 import com.cyberos.app.ui.CyberOSApp
 
 class MainActivity : ComponentActivity() {
@@ -12,6 +14,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Schedule periodic research / writeup sync (WorkManager survives reboots).
         ResearchSyncWorker.schedule(applicationContext)
+        CyberNotificationChannels.ensure(applicationContext)
+        DailyDigestWorker.schedule(applicationContext)
         enableEdgeToEdge()
         setContent {
             CyberOSApp()
