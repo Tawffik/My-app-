@@ -61,7 +61,7 @@ fun HomeScreen(
             Column(Modifier.weight(1f)) {
                 Text(greeting, style = MaterialTheme.typography.headlineMedium)
                 Text(
-                    Lang.t("Stay curious. Stay disciplined.", "Stay curious. Stay disciplined."),
+                    "CyberOS · Learn · Research · Practice",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

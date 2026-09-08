@@ -345,6 +345,21 @@ fun CyberOSApp() {
                             bbPrefillVuln = ""
                             bbLinkedResearchId = 0L
                             bbOpen = true
+                        },
+                        onAiReview = { title, md ->
+                            aiState.mode = ChatMode.BB_COPILOT
+                            aiState.pendingQuestion =
+                                "Review this bug bounty report draft as a senior triage assistant. " +
+                                "Check clarity of steps, whether impact is evidenced or only claimed, " +
+                                "missing severity justification, and suggest improvements. " +
+                                "Do NOT invent new vulnerabilities. Mark anything unverified as hypothesis.\n\n" +
+                                "Title: $title\n\nReport:\n$md"
+                            bbFindingId = 0L
+                            bbPrefillTitle = ""
+                            bbPrefillVuln = ""
+                            bbLinkedResearchId = 0L
+                            aiMode = 0
+                            tab = 5
                         }
                     )
                     bbProgramId != 0L -> ProgramEditScreen(

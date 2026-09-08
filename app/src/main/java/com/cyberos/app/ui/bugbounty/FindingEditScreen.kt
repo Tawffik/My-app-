@@ -30,7 +30,8 @@ fun FindingEditScreen(
     prefillTitle: String = "",
     prefillVuln: String = "",
     linkedResearchId: Long = 0L,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onAiReview: ((title: String, reportMarkdown: String) -> Unit)? = null
 ) {
     val existing = if (findingId > 0) state.getFinding(findingId) else null
     var title by remember { mutableStateOf(existing?.title ?: prefillTitle) }
@@ -211,6 +212,19 @@ fun FindingEditScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(Lang.t("Copy Markdown Report", "Copy Markdown Report"))
+            }
+            if (onAiReview != null) {
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = {
+                        val md = state.reportMarkdown(findingId)
+                        onAiReview(title.ifBlank { "Finding" }, md)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = title.isNotBlank()
+                ) {
+                    Text(Lang.t("AI Report Review", "AI Report Review"))
+                }
             }
         }
         Spacer(Modifier.height(24.dp))
