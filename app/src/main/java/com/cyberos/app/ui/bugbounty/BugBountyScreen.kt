@@ -1,5 +1,7 @@
 package com.cyberos.app.ui.bugbounty
 
+import com.cyberos.app.data.FindingNextAction
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -140,6 +142,14 @@ private fun FindingCard(f: BugBountyFinding, programName: String, onClick: () ->
                 if (f.severity != "None") {
                     AssistChip(onClick = {}, enabled = false, label = { Text(f.severity, style = MaterialTheme.typography.labelSmall) })
                 }
+            }
+            if (FindingNextAction.needsActionToday(f.status)) {
+                Text(
+                    "→ " + FindingNextAction.forStatus(f.status),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 2
+                )
             }
             if (programName.isNotBlank() || f.asset.isNotBlank()) {
                 Spacer(Modifier.height(4.dp))

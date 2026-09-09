@@ -35,6 +35,7 @@ fun HomeScreen(
     onOpenChallenge: () -> Unit,
     onOpenBugBounty: () -> Unit = {},
     onOpenBrief: () -> Unit = {},
+    onStartToday: () -> Unit = {},
     onOpenAiTutor: () -> Unit = {},
     onOpenResearch: () -> Unit = {},
     openFindingsCount: Int = 0,
@@ -92,7 +93,10 @@ fun HomeScreen(
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Spacer(Modifier.height(10.dp))
-                Button(onClick = onOpenBrief) { Text(Lang.t("Open Brief", "Open Brief")) }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = onStartToday) { Text(Lang.t("Start today", "ابدأ اليوم")) }
+                    OutlinedButton(onClick = onOpenBrief) { Text(Lang.t("Brief", "Brief")) }
+                }
             }
         }
         Spacer(Modifier.height(12.dp))

@@ -31,6 +31,7 @@ import com.cyberos.app.ui.research.*
 import com.cyberos.app.ui.bugbounty.*
 import com.cyberos.app.ui.brief.DailyBriefScreen
 import com.cyberos.app.ui.brief.DailyBriefModel
+import com.cyberos.app.ui.brief.StartTodayScreen
 import com.cyberos.app.ui.theme.CyberTheme
 
 @Composable
@@ -107,12 +108,13 @@ fun CyberOSApp() {
     var briefOpen by rememberSaveable { mutableStateOf(false) }
     var reviewOpen by rememberSaveable { mutableStateOf(false) }
     var tasksOpen by rememberSaveable { mutableStateOf(false) }
+    var startTodayOpen by rememberSaveable { mutableStateOf(false) }
     var noteTemplateId by rememberSaveable { mutableStateOf("") }
 
     val overlayOpen = editingId != 0L || notesGraphOpen || openTopicId.isNotEmpty() ||
         methListOpen || methOpenId != 0L || aiSettingsOpen || settingsOpen || graphOpen ||
         taskEditId != 0L || projectOpenId != 0L || searchOpen || focusOpen ||
-        cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L || bbOpen || bbFindingId != 0L || bbProgramId != 0L || bbChecklistOpen || bbAssetsProgramId != 0L || briefOpen || reviewOpen || tasksOpen
+        cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L || bbOpen || bbFindingId != 0L || bbProgramId != 0L || bbChecklistOpen || bbAssetsProgramId != 0L || briefOpen || reviewOpen || tasksOpen || startTodayOpen
 
     LaunchedEffect(Unit) { if (tab !in 0..4) tab = 0 }
 
@@ -199,6 +201,14 @@ fun CyberOSApp() {
                         },
                         onGenerateCards = { t, b ->
                             cardGenSource = "Title: $t\n\n$b"; editingId = 0L; cardGenOpen = true
+                        },
+                        onCreateFinding = { t, b ->
+                            bbPrefillTitle = t
+                            bbPrefillVuln = "Other"
+                            bbLinkedResearchId = 0L
+                            editingId = 0L
+                            noteTemplateId = ""
+                            bbFindingId = -1L
                         },
                         onCreateLinkedNote = { linkTitle ->
                             notesState.upsert(
@@ -308,6 +318,27 @@ fun CyberOSApp() {
                         onOpenAiSettings = { aiSettingsOpen = true },
                         onBack = { settingsOpen = false }
                     )
+                    startTodayOpen -> StartTodayScreen(
+                        cardsDue = cardStore.countDue(System.currentTimeMillis()),
+                        nextTopic = CyberCurriculum.firstIncompleteTopic { progressState.isCompleted(it) },
+                        openFindings = bugBountyState.findings.filter {
+                            FindingNextAction.needsActionToday(it.status)
+                        },
+                        recentWriteup = researchState.items.firstOrNull {
+                            it.tags.contains("writeup") || it.category == "Bug Bounty"
+                        },
+                        onBack = { startTodayOpen = false },
+                        onReview = { startTodayOpen = false; reviewOpen = true },
+                        onOpenTopic = { id -> startTodayOpen = false; openTopicId = id },
+                        onOpenNotes = { startTodayOpen = false; tab = 3 },
+                        onOpenFinding = { id -> startTodayOpen = false; bbFindingId = id },
+                        onOpenResearch = { startTodayOpen = false; tab = 2 },
+                        onDone = {
+                            progressState.addXp(15L)
+                            startTodayOpen = false
+                            tab = 0
+                        }
+                    )
                     tab == 0 -> HomeScreen(
                         progress = progressState, cardStore = cardStore,
                         tasks = taskState.tasks,
@@ -321,6 +352,7 @@ fun CyberOSApp() {
                         onOpenChallenge = { challengeOpen = true },
                         onOpenBugBounty = { bbOpen = true },
                         onOpenBrief = { briefOpen = true },
+                        onStartToday = { startTodayOpen = true },
                         onOpenAiTutor = {
                             aiState.mode = ChatMode.AI_TUTOR
                             aiMode = 0

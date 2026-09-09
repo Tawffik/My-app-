@@ -233,7 +233,11 @@ class BugBountyState(
     fun filteredFindings(): List<BugBountyFinding> {
         var list = findings
         if (programFilter > 0L) list = list.filter { it.programId == programFilter }
-        if (statusFilter != "All") list = list.filter { it.status == statusFilter }
+        if (statusFilter == "Needs action") {
+            list = list.filter { FindingNextAction.needsActionToday(it.status) }
+        } else if (statusFilter != "All") {
+            list = list.filter { it.status == statusFilter }
+        }
         if (vulnFilter != "All") list = list.filter { it.vulnerabilityType.equals(vulnFilter, true) }
         return list
     }

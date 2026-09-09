@@ -1,3 +1,4 @@
+import com.cyberos.app.data.FindingNextAction
 package com.cyberos.app.ui.bugbounty
 
 import androidx.compose.foundation.layout.*
@@ -149,6 +150,16 @@ fun FindingEditScreen(
         }
         Spacer(Modifier.height(8.dp))
 
+        Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+            Column(Modifier.padding(12.dp)) {
+                Text(Lang.t("Next action", "الخطوة الجاية"), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    FindingNextAction.forStatus(status),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+        Spacer(Modifier.height(8.dp))
         OutlinedTextField(value = asset, onValueChange = { asset = it }, label = { Text("Asset") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(value = endpoint, onValueChange = { endpoint = it }, label = { Text("Endpoint") }, modifier = Modifier.fillMaxWidth(), singleLine = true)

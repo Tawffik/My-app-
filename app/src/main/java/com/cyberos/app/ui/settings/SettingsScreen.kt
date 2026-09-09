@@ -73,6 +73,14 @@ fun SettingsScreen(
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp)) {
                 Text(Lang.t("Data & Backup", "البيانات"), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    Lang.t(
+                        "Full export: notes, cards, progress, tasks, research, bug bounty.",
+                        "تصدير كامل: نوتس، كروت، تقدم، مهام، أبحاث، باج باونتي."
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(Modifier.height(10.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = { exportLauncher.launch("CyberOS-backup.json") }, modifier = Modifier.weight(1f)) { Text(Lang.t("Export", "تصدير")) }
@@ -85,7 +93,7 @@ fun SettingsScreen(
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp)) {
                 Text("About", style = MaterialTheme.typography.titleMedium)
-                Text("CyberOS v1.0.0")
+                Text("CyberOS v1.0.38")
             }
         }
     }

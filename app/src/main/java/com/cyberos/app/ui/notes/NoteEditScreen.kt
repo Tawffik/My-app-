@@ -26,6 +26,7 @@ fun NoteEditScreen(
     onSave: (title: String, body: String, tags: List<String>, folder: String, pinned: Boolean) -> Unit,
     onAskAi: (String, String) -> Unit,
     onGenerateCards: (String, String) -> Unit,
+    onCreateFinding: ((String, String) -> Unit)? = null,
     onCreateLinkedNote: ((title: String) -> Unit)? = null,
     onDuplicate: (() -> Unit)? = null,
     unlinkedMentions: List<Note> = emptyList()
@@ -185,6 +186,13 @@ fun NoteEditScreen(
                 enabled = body.isNotBlank(),
                 modifier = Modifier.weight(1f)
             ) { Text("🃏 Cards") }
+            if (onCreateFinding != null) {
+                OutlinedButton(
+                    onClick = { onCreateFinding(title.ifBlank { "Note" }, body) },
+                    enabled = title.isNotBlank() || body.isNotBlank(),
+                    modifier = Modifier.weight(1f)
+                ) { Text(Lang.t("Finding", "Finding")) }
+            }
             Button(
                 onClick = { onSave(title, body, parseTags(tagsRaw), folder, pinned) },
                 enabled = title.isNotBlank() || body.isNotBlank(),
