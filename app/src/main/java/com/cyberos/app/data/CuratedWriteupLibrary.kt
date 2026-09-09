@@ -324,10 +324,7 @@ object CuratedWriteupLibrary {
             "Tips",
             listOf("tips", "checklist", "methodology"),
             "Curated hub — community tips/checklists for BB."
-        )
-    )
-
-
+        ),
         // --- Additional from BugBountyDaily-style sheet ---
         Entry(
             "PortSwigger — DOM-based AngularJS sandbox escapes",
@@ -538,7 +535,8 @@ object CuratedWriteupLibrary {
             "Tips",
             listOf("tips", "checklist"),
             "Curated hub — community tips/checklists."
-        ),
+        )
+    )
 
     /** Manual follow list (Telegram/X cannot be polled without APIs). */
     val CHANNEL_HINTS: List<Pair<String, String>> = listOf(
