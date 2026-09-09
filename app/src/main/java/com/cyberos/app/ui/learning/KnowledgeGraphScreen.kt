@@ -21,7 +21,7 @@ import com.cyberos.app.ui.lang.Lang
 
 @Composable
 fun KnowledgeGraphScreen(onBack: () -> Unit, onOpenTopic: (String) -> Unit) {
-    val topics = remember { CyberCurriculum.paths.flatMap { it.topics } }
+    val topics = remember { CyberCurriculum.allPaths().flatMap { it.topics } }
     val textMeasurer = rememberTextMeasurer()
     val nodeGreen = Color(0xFF10B981)
     val nodeBg = Color(0xFF09090B)

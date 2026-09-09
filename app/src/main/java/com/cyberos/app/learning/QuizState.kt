@@ -40,7 +40,7 @@ class QuizState {
     }
 
     fun startMixed(count: Int = 10) {
-        val all = CyberCurriculum.paths
+        val all = CyberCurriculum.allPaths()
             .flatMap { p -> p.topics }
             .flatMap { t -> t.quiz.map { t.title to it } }
         val picked = all.shuffled().take(count)

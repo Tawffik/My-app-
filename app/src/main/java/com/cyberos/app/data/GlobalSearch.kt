@@ -15,7 +15,7 @@ object GlobalSearch {
         val out = mutableListOf<Hit>()
 
         var topicCount = 0
-        for (p in CyberCurriculum.paths) {
+        for (p in CyberCurriculum.allPaths()) {
             for (t in p.topics) {
                 if (topicCount >= LIMIT) break
                 if (t.title.lowercase().contains(query) || t.summary.lowercase().contains(query)) {
