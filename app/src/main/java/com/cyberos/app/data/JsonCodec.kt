@@ -15,6 +15,7 @@ object JsonCodec {
             a.put(JSONObject().apply {
                 put("id", n.id); put("title", n.title); put("body", n.body)
                 put("tags", JSONArray(n.tags)); put("createdAt", n.createdAt); put("updatedAt", n.updatedAt)
+                put("folder", n.folder); put("pinned", n.pinned)
             })
         }
         return a.toString()
@@ -27,7 +28,18 @@ object JsonCodec {
             val o = a.getJSONObject(i)
             val tags = mutableListOf<String>()
             o.optJSONArray("tags")?.let { t -> for (j in 0 until t.length()) tags.add(t.optString(j)) }
-            out.add(Note(o.getLong("id"), o.optString("title"), o.optString("body"), tags, o.optLong("createdAt"), o.optLong("updatedAt")))
+            out.add(
+                Note(
+                    o.getLong("id"),
+                    o.optString("title"),
+                    o.optString("body"),
+                    tags,
+                    o.optLong("createdAt"),
+                    o.optLong("updatedAt"),
+                    o.optString("folder", ""),
+                    o.optBoolean("pinned", false)
+                )
+            )
         }
         return out
     }

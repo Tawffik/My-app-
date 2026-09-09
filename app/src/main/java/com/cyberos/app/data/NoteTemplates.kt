@@ -36,7 +36,7 @@ Program / system / lab:
 -
 
 ## Links
-Research / Finding / Topic:
+- [[]]
 """.trimIndent()
         ),
         NoteTemplate(
@@ -60,6 +60,9 @@ Title / URL:
 
 ## What I learned
 -
+
+## Linked concepts
+- [[]]
 
 ## Flashcard candidates
 Q:
@@ -86,6 +89,9 @@ A:
 ## Mistake / insight
 -
 
+## Related notes
+- [[]]
+
 ## Next practice
 -
 """.trimIndent()
@@ -109,6 +115,9 @@ Prompt injection | RAG | Agency | Output handling | Other:
 
 ## Defense idea
 -
+
+## Links
+- [[]]
 
 ## Takeaway
 -
@@ -134,8 +143,56 @@ Prompt injection | RAG | Agency | Output handling | Other:
 ## Status
 Idea | Investigating | Validated | Dead end
 
+## Notes graph
+- [[]]
+
 ## Next action
 -
+""".trimIndent()
+        ),
+        NoteTemplate(
+            id = "moc",
+            title = "Map of Content (MOC)",
+            tags = listOf("moc", "index"),
+            body = """
+## Purpose
+Hub note that indexes related notes (Obsidian-style MOC).
+
+## Core ideas
+-
+
+## Linked notes
+- [[]]
+- [[]]
+- [[]]
+
+## Open questions
+-
+
+## Resources
+-
+""".trimIndent()
+        ),
+        NoteTemplate(
+            id = "concept",
+            title = "Concept Card",
+            tags = listOf("concept", "study"),
+            body = """
+## Concept
+-
+
+## In my words
+-
+
+## Example / lab
+-
+
+## Related
+- [[]]
+
+## One flashcard
+Q:
+A:
 """.trimIndent()
         )
     )

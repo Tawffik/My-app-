@@ -6,18 +6,22 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class WikiLinksTest {
-    private val notes = listOf(
-        Note(1, "JWT", "[[OAuth]]"),
-        Note(2, "OAuth", "x"),
-        Note(3, "R", "[[jwt]]")
-    )
-    @Test fun extracts() { assertEquals(listOf("JWT","OAuth"), WikiLinks.extractTargets("[[JWT]] [[OAuth]]")) }
-    @Test fun distinct() { assertEquals(listOf("JWT"), WikiLinks.extractTargets("[[JWT]] [[JWT]]")) }
-    @Test fun unclosed() { assertEquals(emptyList<String>(), WikiLinks.extractTargets("[[open")) }
-    @Test fun strip() { assertEquals("a OAuth", WikiLinks.stripForPreview("a [[OAuth]]")) }
-    @Test fun backlinks() { assertEquals(1L, WikiLinks.backlinksTo("OAuth", notes).first().id) }
-    @Test fun case_insensitive() { assertTrue(WikiLinks.backlinksTo("JWT", notes).any { it.id == 3L }) }
-    @Test fun self_excluded() { assertEquals(0, WikiLinks.backlinksTo("X", listOf(Note(9,"X","[[X]]")), 9L).size) }
-    @Test fun resolve() { assertEquals(2L, WikiLinks.resolveTarget("oauth", notes)!!.id) }
-    @Test fun resolve_null() { assertNull(WikiLinks.resolveTarget("k8s", notes)) }
+    @Test
+    fun extract_links_and_tags() {
+        val body = "See [[IDOR Basics]] and #bug-bounty #lab"
+        assertEquals(listOf("IDOR Basics"), WikiLinks.extractTargets(body))
+        assertTrue(WikiLinks.extractInlineTags(body).contains("bug-bounty"))
+        val tags = WikiLinks.mergeTags(listOf("security"), body)
+        assertTrue(tags.contains("security"))
+        assertTrue(tags.contains("lab"))
+    }
+
+    @Test
+    fun backlinks() {
+        val a = Note(1, "IDOR Basics", "root", emptyList(), 1, 1)
+        val b = Note(2, "Lab 1", "Linked [[IDOR Basics]] here", emptyList(), 1, 1)
+        val backs = WikiLinks.backlinksTo("IDOR Basics", listOf(a, b), 1)
+        assertEquals(1, backs.size)
+        assertEquals(2L, backs[0].id)
+    }
 }

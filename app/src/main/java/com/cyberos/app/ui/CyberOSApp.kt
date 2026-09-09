@@ -174,7 +174,11 @@ fun CyberOSApp() {
                         allNotes = notesState.notes,
                         onOpenNote = { id -> editingId = id },
                         onBack = { editingId = 0L; noteTemplateId = "" },
-                        onSave = { t, b, tg -> notesState.upsert(editingId, t, b, tg); editingId = 0L; noteTemplateId = "" },
+                        onSave = { t, b, tg, folder, pinned ->
+                            notesState.upsert(editingId, t, b, tg, folder, pinned)
+                            editingId = 0L
+                            noteTemplateId = ""
+                        },
                         onAskAi = { t, b ->
                             aiState.pendingQuestion = "حلّل الملاحظة دي أمنيًا وصحّح أي معلومة."
                             aiState.pendingContext = "Title: $t\n\nContent:\n$b"

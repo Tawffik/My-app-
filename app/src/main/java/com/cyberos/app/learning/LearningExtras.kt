@@ -204,6 +204,57 @@ object LearningExtras {
                 flashcards = listOf("AI output is?" to "Hypothesis until you verify.")
             ),
             TopicData(
+                
+            TopicData(
+                id = "rm-cors-deep",
+                title = "CORS & SOP for hunters",
+                summary = "When CORS misconfig turns a browser into a cross-origin reader.",
+                sections = listOf(
+                    sec("SOP", "Default: scripts cannot read other origins' responses."),
+                    sec("CORS", "Server opts-in via ACAO/ACAC; wildcards + credentials are dangerous."),
+                    sec("Hunter angle", "Look for reflect Origin, null origin, and trusted subdomain takeover.")
+                ),
+                related = listOf("rm-browser-sec", "csrf"),
+                flashcards = listOf(
+                    "CORS is?" to "Server-controlled relaxation of SOP for reads.",
+                    "Dangerous pattern?" to "ACAO reflects Origin with ACAC true."
+                ),
+                resources = listOf(
+                    "PortSwigger CORS" to "https://portswigger.net/web-security/cors"
+                )
+            ),
+            TopicData(
+                id = "rm-file-upload",
+                title = "File upload attack surface",
+                summary = "Content-type, extension, path, and processing pipeline.",
+                sections = listOf(
+                    sec("Checks", "Extension · MIME · magic bytes · size · path · authz on download."),
+                    sec("Impact classes", "XSS via stored file, RCE via dangerous parsers, overwrite."),
+                    sec("Lab only", "Never test uploads on systems without authorization.")
+                ),
+                related = listOf("xss", "rm-bb-workflow"),
+                flashcards = listOf(
+                    "Upload testing focus?" to "Validation gaps between extension, MIME, and processor."
+                )
+            ),
+            TopicData(
+                id = "rm-ssrf-map",
+                title = "SSRF mapping mindset",
+                summary = "Features that fetch URLs: webhooks, importers, PDF renderers, thumbnailers.",
+                sections = listOf(
+                    sec("Find", "Any server-side request initiated from user-controlled URL."),
+                    sec("Impact", "Cloud metadata, internal admin, port scan, protocol smuggling."),
+                    sec("Note", "Link findings to [[SSRF]] concept note in your vault.")
+                ),
+                related = listOf("ssrf", "rm-apis"),
+                flashcards = listOf(
+                    "SSRF core?" to "Server requests a resource the attacker chooses."
+                ),
+                resources = listOf(
+                    "PortSwigger SSRF" to "https://portswigger.net/web-security/ssrf"
+                )
+            ),
+            
                 id = "rm-notes-system",
                 title = "Part 20–22 — Notes, explain-without-looking, weekly projects",
                 summary = "Professional study system: notes template, active recall, weekly builds.",
@@ -317,6 +368,52 @@ object LearningExtras {
                 )
             ),
             TopicData(
+                
+            TopicData(
+                id = "ea-mass-assignment",
+                title = "Mass assignment & hidden fields",
+                summary = "Extra JSON/form fields the UI never shows can change role, price, or owner.",
+                sections = listOf(
+                    sec("Idea", "Client sends fields the server binds into objects without allow-list."),
+                    sec("Where", "Register/update profile, checkout, admin flags in JSON."),
+                    sec("Test", "Authorized lab: add role=admin, is_admin=true, price=0 and observe."),
+                    sec("Defense", "Allow-list bindable fields; never trust client for authz attributes.")
+                ),
+                related = listOf("access-control", "ea-type-spoof"),
+                flashcards = listOf(
+                    "Mass assignment?" to "Unexpected fields bind into privileged model properties.",
+                    "Fix?" to "Server-side allow-list of writable fields."
+                )
+            ),
+            TopicData(
+                id = "ea-method-override",
+                title = "HTTP method override tricks",
+                summary = "X-HTTP-Method-Override / _method may reach a different handler than the verb you think.",
+                sections = listOf(
+                    sec("Idea", "Gateways or frameworks remap POST to PUT/DELETE/PATCH via headers or body."),
+                    sec("Risk", "CSRF defenses or authz hooks attached only to some verbs."),
+                    sec("Practice", "In lab, compare POST vs overridden method on same path.")
+                ),
+                related = listOf("csrf", "ea-path-query"),
+                flashcards = listOf(
+                    "Why care about override?" to "Security filters may not run on the effective method."
+                )
+            ),
+            TopicData(
+                id = "ea-idor-variants",
+                title = "IDOR variants checklist",
+                summary = "Numeric IDs, UUIDs, emails, filenames, export jobs, and secondary keys.",
+                sections = listOf(
+                    sec("Checklist", "Path id · query id · body id · filename · export token · share link · analytics id."),
+                    sec("Blind IDOR", "No data in response but state changes (delete, email trigger)."),
+                    sec("Note habit", "Write one [[Concept]] note per variant you confirm in a lab.")
+                ),
+                related = listOf("ea-idor-mindset", "idor"),
+                flashcards = listOf(
+                    "Blind IDOR?" to "Effect without direct data read in response."
+                )
+            ),
+            
                 id = "ea-apply-loop",
                 title = "Apply loop: note → lab → report",
                 summary = "Turn each trick into a structured note and an authorized test checklist.",
