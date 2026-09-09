@@ -128,7 +128,7 @@ fun TopicScreen(
                         Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Text("🔗", style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
                             Text(label, style = MaterialTheme.typography.titleSmall)
