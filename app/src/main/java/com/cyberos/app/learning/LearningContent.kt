@@ -6,7 +6,9 @@ data class TopicData(
     val id: String, val title: String, val summary: String,
     val sections: List<TopicSection>, val related: List<String>,
     val flashcards: List<Pair<String, String>>,
-    val quiz: List<QuizQuestion> = emptyList()
+    val quiz: List<QuizQuestion> = emptyList(),
+    /** Optional study sources opened in Custom Tabs. */
+    val resources: List<Pair<String, String>> = emptyList()
 )
 data class PathData(val id: String, val title: String, val description: String, val topics: List<TopicData>)
 
@@ -552,22 +554,30 @@ object CyberCurriculum {
 
     )
 
+    /** Runtime user paths from CustomPathStore — set on app start / after edit. */
+    @Volatile
+    var dynamicPaths: List<PathData> = emptyList()
+
+    fun allPaths(): List<PathData> = paths + LearningExtras.paths + dynamicPaths
+
     fun findTopic(id: String): TopicData? {
-        for (p in paths) for (t in p.topics) if (t.id == id) return t
+        for (p in allPaths()) for (t in p.topics) if (t.id == id) return t
         return null
     }
 
+    fun findPath(id: String): PathData? = allPaths().firstOrNull { it.id == id }
+
     fun topicTitle(id: String): String = findTopic(id)?.title ?: id
-    fun totalTopics(): Int = paths.sumOf { it.topics.size }
+    fun totalTopics(): Int = allPaths().sumOf { it.topics.size }
 
     fun firstIncompleteTopic(isDone: (String) -> Boolean): TopicData? {
-        for (p in paths) for (t in p.topics) if (!isDone(t.id)) return t
+        for (p in allPaths()) for (t in p.topics) if (!isDone(t.id)) return t
         return null
     }
 
     fun allFlashcards(): List<Triple<String, String, String>> {
         val out = mutableListOf<Triple<String, String, String>>()
-        for (p in paths) for (t in p.topics) for (fc in t.flashcards) {
+        for (p in allPaths()) for (t in p.topics) for (fc in t.flashcards) {
             out.add(Triple(t.id, fc.first, fc.second))
         }
         return out

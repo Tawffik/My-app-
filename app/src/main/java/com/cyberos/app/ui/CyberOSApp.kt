@@ -51,6 +51,9 @@ fun CyberOSApp() {
     val methState = remember { MethodologyState(methStore) }
     val progressStore = remember { ProgressStore(appCtx) }
     val progressState = remember { ProgressState(progressStore) }
+    val customPathStore = remember { CustomPathStore(appCtx) }
+    // merge user paths into curriculum
+    CyberCurriculum.dynamicPaths = customPathStore.all()
     val taskStore = remember { TaskStore(appCtx) }
     val taskState = remember { TaskState(taskStore) }
     val projectStore = remember { ProjectStore(appCtx) }
@@ -191,9 +194,20 @@ fun CyberOSApp() {
                     openTopicId.isNotEmpty() -> TopicScreen(
                         topicId = openTopicId, progress = progressState,
                         onBack = { openTopicId = "" },
-                        onAskAi = { q -> aiState.pendingQuestion = q; openTopicId = ""; aiMode = 0; tab = 5 },
+                        onAskAi = { q ->
+                            aiState.mode = ChatMode.AI_TUTOR
+                            aiState.pendingQuestion = q
+                            openTopicId = ""
+                            aiMode = 0
+                            tab = 5
+                        },
                         onOpenTopic = { openTopicId = it },
-                        onOpenQuiz = { tid -> quizState.startForTopic(tid); quizOpen = tid }
+                        onOpenQuiz = { tid -> quizState.startForTopic(tid); quizOpen = tid },
+                        onCreateNote = { title, body ->
+                            notesState.upsert(-1L, title, body, listOf("study", "learning"))
+                            openTopicId = ""
+                            tab = 4
+                        }
                     )
                     quizOpen != null -> QuizScreen(state = quizState, progress = progressState, onClose = { quizOpen = null })
                     challengeOpen -> ChallengeScreen(
@@ -308,7 +322,9 @@ fun CyberOSApp() {
                     tab == 1 -> LearningScreen(
                         progress = progressState,
                         onOpenTopic = { openTopicId = it },
-                        onOpenGraph = { graphOpen = true }
+                        onOpenGraph = { graphOpen = true },
+                        customStore = customPathStore,
+                        onCustomChanged = { }
                     )
                     tab == 2 -> ReviewScreen(review = reviewState, progress = progressState)
                     tab == 3 -> TasksScreen(
