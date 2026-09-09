@@ -24,7 +24,8 @@ import java.util.*
 fun NotesScreen(
     state: NotesState,
     onOpen: (Long) -> Unit,
-    onOpenTemplate: (String) -> Unit = {}
+    onOpenTemplate: (String) -> Unit = {},
+    onOpenGraph: () -> Unit = {}
 ) {
     var deleteTarget by remember { mutableStateOf<Note?>(null) }
     val list = state.filtered()
@@ -44,6 +45,9 @@ fun NotesScreen(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+            TextButton(onClick = onOpenGraph) {
+                Text(Lang.t("Graph", "شبكة"))
             }
             TextButton(onClick = { onOpen(state.openOrCreateDaily()) }) {
                 Text(Lang.t("Daily", "يومي"))

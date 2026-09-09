@@ -95,6 +95,38 @@ class NotesState(private val store: NoteStore) {
         )
     }
 
+    fun orphans(): List<Note> {
+        val edges = WikiLinks.graphEdges(notes)
+        val linked = edges.flatMap { listOf(it.first, it.second) }.toSet()
+        return notes.filter { it.id !in linked }
+    }
+
+    fun duplicate(id: Long): Long {
+        val n = store.get(id) ?: return -1L
+        val copy = n.copy(
+            id = store.nextId(),
+            title = n.title + " (copy)",
+            createdAt = System.currentTimeMillis(),
+            updatedAt = System.currentTimeMillis(),
+            pinned = false
+        )
+        store.save(copy)
+        notes = store.all()
+        return copy.id
+    }
+
+    /** Mentions of this title in other notes without formal [[link]] — title substring heuristic. */
+    fun unlinkedMentions(title: String, excludeId: Long?): List<Note> {
+        val t = title.trim()
+        if (t.length < 3) return emptyList()
+        val lower = t.lowercase()
+        return notes.filter { n ->
+            n.id != excludeId &&
+                n.body.contains(t, ignoreCase = true) &&
+                WikiLinks.extractTargets(n.body).none { it.equals(t, ignoreCase = true) }
+        }
+    }
+
     /** Create or open today's daily note. Returns note id. */
     fun openOrCreateDaily(): Long {
         val day = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())

@@ -3,8 +3,8 @@ package com.cyberos.app.learning
 object LearningExtras {
 
     val paths: List<PathData> = listOf(
-        webRoadmapPath(),
-        eliteAccessPath(),
+        webRoadmapPath().let { it.copy(topics = it.topics + LearningExtrasMore.extraTopicsForRoadmap()) },
+        eliteAccessPath().let { it.copy(topics = it.topics + LearningExtrasMore.extraTopicsForElite()) },
         studyMethodPath()
     )
 

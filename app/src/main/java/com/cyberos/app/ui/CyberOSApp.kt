@@ -77,6 +77,7 @@ fun CyberOSApp() {
     }
 
     var editingId by rememberSaveable { mutableStateOf(0L) }
+    var notesGraphOpen by rememberSaveable { mutableStateOf(false) }
     var tab by rememberSaveable { mutableStateOf(0) }
     var aiMode by rememberSaveable { mutableStateOf(0) }
     var aiSettingsOpen by rememberSaveable { mutableStateOf(false) }
@@ -105,7 +106,7 @@ fun CyberOSApp() {
     var briefOpen by rememberSaveable { mutableStateOf(false) }
     var noteTemplateId by rememberSaveable { mutableStateOf("") }
 
-    val overlayOpen = editingId != 0L || openTopicId.isNotEmpty() ||
+    val overlayOpen = editingId != 0L || notesGraphOpen || openTopicId.isNotEmpty() ||
         methListOpen || methOpenId != 0L || aiSettingsOpen || settingsOpen || graphOpen ||
         taskEditId != 0L || projectOpenId != 0L || searchOpen || focusOpen ||
         cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L || bbOpen || bbFindingId != 0L || bbProgramId != 0L || bbChecklistOpen || bbAssetsProgramId != 0L || briefOpen
@@ -185,8 +186,41 @@ fun CyberOSApp() {
                             editingId = 0L; aiMode = 0; tab = 5
                         },
                         onGenerateCards = { t, b ->
-                            cardGenSource = "Title: $t\n\n$b"; editingId = 0L; cardGenOpen = true
-                        }
+                            cardGenSource = "Title: $t
+
+$b"; editingId = 0L; cardGenOpen = true
+                        },
+                        onCreateLinkedNote = { linkTitle ->
+                            notesState.upsert(
+                                -1L,
+                                linkTitle,
+                                "## Linked from another note
+
+",
+                                listOf("linked"),
+                                folder = "Inbox",
+                                pinned = false
+                            )
+                            val created = notesState.notes.firstOrNull {
+                                it.title.equals(linkTitle, ignoreCase = true)
+                            }
+                            if (created != null) editingId = created.id
+                        },
+                        onDuplicate = {
+                            if (editingId > 0) {
+                                val nid = notesState.duplicate(editingId)
+                                if (nid > 0) editingId = nid
+                            }
+                        },
+                        unlinkedMentions = if (editingId > 0) {
+                            val n = notesState.get(editingId)
+                            if (n != null) notesState.unlinkedMentions(n.title, n.id) else emptyList()
+                        } else emptyList()
+                    )
+                    notesGraphOpen -> NotesGraphScreen(
+                        notes = notesState.notes,
+                        onBack = { notesGraphOpen = false },
+                        onOpen = { id -> notesGraphOpen = false; editingId = id }
                     )
                     taskEditId != 0L -> TaskEditScreen(
                         task = if (taskEditId > 0) taskState.get(taskEditId) else null,
@@ -340,7 +374,8 @@ fun CyberOSApp() {
                     tab == 4 -> NotesScreen(
                         state = notesState,
                         onOpen = { id -> editingId = id },
-                        onOpenTemplate = { tid -> noteTemplateId = tid; editingId = -1L }
+                        onOpenTemplate = { tid -> noteTemplateId = tid; editingId = -1L },
+                        onOpenGraph = { notesGraphOpen = true }
                     )
                     researchOpenId != 0L -> ResearchDetailScreen(
                         state = researchState, id = researchOpenId,

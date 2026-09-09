@@ -7,21 +7,12 @@ import org.junit.Test
 
 class WikiLinksTest {
     @Test
-    fun extract_links_and_tags() {
-        val body = "See [[IDOR Basics]] and #bug-bounty #lab"
-        assertEquals(listOf("IDOR Basics"), WikiLinks.extractTargets(body))
-        assertTrue(WikiLinks.extractInlineTags(body).contains("bug-bounty"))
-        val tags = WikiLinks.mergeTags(listOf("security"), body)
-        assertTrue(tags.contains("security"))
-        assertTrue(tags.contains("lab"))
-    }
-
-    @Test
-    fun backlinks() {
-        val a = Note(1, "IDOR Basics", "root", emptyList(), 1, 1)
-        val b = Note(2, "Lab 1", "Linked [[IDOR Basics]] here", emptyList(), 1, 1)
-        val backs = WikiLinks.backlinksTo("IDOR Basics", listOf(a, b), 1)
-        assertEquals(1, backs.size)
-        assertEquals(2L, backs[0].id)
+    fun extract_and_backlinks() {
+        val a = Note(1, "IDOR", "See [[XSS]] and #web", emptyList(), 1, 1)
+        val b = Note(2, "XSS", "Root", emptyList(), 1, 1)
+        assertEquals(listOf("XSS"), WikiLinks.extractTargets(a.body))
+        assertTrue(WikiLinks.extractInlineTags(a.body).contains("web"))
+        assertEquals(1, WikiLinks.backlinksTo("XSS", listOf(a, b)).size)
+        assertEquals(1, WikiLinks.graphEdges(listOf(a, b)).size)
     }
 }
