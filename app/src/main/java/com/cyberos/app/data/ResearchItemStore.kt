@@ -50,6 +50,51 @@ class ResearchItemStore(context: Context) {
         return a.toString()
     }
 
+    
+    /** One-time seed of high-signal writeups so Research is useful before first network sync. */
+    @Synchronized
+    fun seedCuratedIfNeeded() {
+        val marker = "cyberos-curated-v1"
+        val already = cache.any { it.tags.contains(marker) }
+        if (already) return
+        val now = System.currentTimeMillis()
+        var id = nextId()
+        val seeded = CuratedWriteupLibrary.WRITEUPS.map { e ->
+            ResearchItem(
+                id = id++,
+                sourceId = 0L,
+                title = e.title,
+                link = e.link,
+                author = "CyberOS Curated",
+                summary = e.summary,
+                category = e.category,
+                tags = e.tags + marker,
+                vulnerabilityType = BugBountyFilters.detectVulnType(e.title, e.summary),
+                publishedAt = now,
+                retrievedAt = now
+            )
+        }
+        // Channel hints as Tips entries
+        val hints = CuratedWriteupLibrary.CHANNEL_HINTS.map { (name, url) ->
+            ResearchItem(
+                id = id++,
+                sourceId = 0L,
+                title = "Follow: $name",
+                link = url,
+                author = "CyberOS Curated",
+                summary = "Live channel / site — open in browser (not auto-synced).",
+                category = "Tips",
+                tags = listOf("tips", "channel", marker),
+                vulnerabilityType = "Other",
+                publishedAt = now,
+                retrievedAt = now
+            )
+        }
+        cache.addAll(seeded)
+        cache.addAll(hints)
+        persist()
+    }
+
     private fun persist() { try { file.writeText(toJson()) } catch (_: Exception) { } }
 
     private fun load(): MutableList<ResearchItem> {

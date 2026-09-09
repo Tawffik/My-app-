@@ -73,7 +73,33 @@ class ResearchSourceStore(context: Context) {
         ResearchSource(8, "NVIDIA Developer Cybersecurity", "https://developer.nvidia.com/blog/tag/cybersecurity/feed/", "RSS", true, "Tier1", "AI Security"),
         ResearchSource(9, "Simon Willison", "https://simonwillison.net/atom/everything/", "RSS", true, "Tier1", "AI Security"),
         ResearchSource(10, "Google Project Zero", "https://googleprojectzero.blogspot.com/feeds/posts/default", "RSS", true, "Tier1", "Vulnerabilities"),
-        ResearchSource(11, "Krebs on Security", "https://krebsonsecurity.com/feed/", "RSS", true, "Tier2", "Threat Intelligence")
+        ResearchSource(11, "Krebs on Security", "https://krebsonsecurity.com/feed/", "RSS", true, "Tier2", "Threat Intelligence"),
+        // Additional writeup aggregators & platforms
+        ResearchSource(
+            12,
+            "Awesome BB Writeups (GitHub)",
+            "https://raw.githubusercontent.com/devanshbatham/Awesome-Bugbounty-Writeups/master/README.md",
+            "MARKDOWN",
+            true,
+            "Tier2",
+            "Bug Bounty"
+        ),
+        ResearchSource(
+            13,
+            "HackerOne Disclosed (archive list)",
+            "https://raw.githubusercontent.com/ajaysenr/HackerOne-Disclosed-Reports/main/reports.txt",
+            "LINKLIST",
+            true,
+            "Tier2",
+            "Bug Bounty"
+        ),
+        ResearchSource(14, "Intigriti Blog", "https://www.intigriti.com/blog/feed", "RSS", true, "Tier2", "Bug Bounty"),
+        ResearchSource(15, "YesWeHack Blog", "https://www.yeswehack.com/feed", "RSS", true, "Tier2", "Bug Bounty"),
+        ResearchSource(16, "Medium XSS tag", "https://medium.com/feed/tag/xss", "RSS", true, "Tier2", "Bug Bounty"),
+        ResearchSource(17, "Medium IDOR tag", "https://medium.com/feed/tag/idor", "RSS", true, "Tier2", "Bug Bounty"),
+        ResearchSource(18, "GitHub Blog Bug Bounty", "https://github.blog/tag/bug-bounty/feed/", "RSS", true, "Tier2", "Bug Bounty"),
+        ResearchSource(19, "Medium Bug Bounty Tips", "https://medium.com/feed/tag/bug-bounty-tips", "RSS", true, "Tier2", "Tips"),
+        ResearchSource(20, "Embrace The Red", "https://embracethered.com/blog/index.xml", "RSS", true, "Tier1", "AI Security")
     )
 
     private fun toJson(): String {

@@ -34,7 +34,8 @@ class ResearchFetcher(
             if (body.isNullOrBlank()) return 0
 
             val parsed: List<RssAtomParser.ParsedItem> = when (source.type.uppercase()) {
-                "MARKDOWN" -> parseMarkdownWriteups(body)
+                "MARKDOWN" -> parseMarkdownWriteups(body, source.name)
+                "LINKLIST" -> parseLinkList(body, source.name)
                 else -> RssAtomParser.parse(body)
             }
 
@@ -42,10 +43,9 @@ class ResearchFetcher(
             var nextId = itemStore.nextId()
             val existing = itemStore.all()
             val candidates = parsed.map { p ->
-                val category = if (source.category == "Bug Bounty") {
-                    "Bug Bounty"
-                } else {
-                    ResearchCategorizer.categorize(p.title, p.summary)
+                val category = when (source.category) {
+                    "Bug Bounty", "Tips", "AI Security", "Web Security", "Authentication" -> source.category
+                    else -> ResearchCategorizer.categorize(p.title, p.summary)
                 }
                 val vulnType = BugBountyFilters.detectVulnType(p.title, p.summary)
                 val tags = ResearchCategorizer.buildTags(p.title, p.summary)
@@ -71,14 +71,26 @@ class ResearchFetcher(
         }
     }
 
-    private fun parseMarkdownWriteups(markdown: String): List<RssAtomParser.ParsedItem> {
+    private fun parseMarkdownWriteups(markdown: String, sourceName: String): List<RssAtomParser.ParsedItem> {
         return DailyWriteupParser.parseReadme(markdown).map { w ->
             RssAtomParser.ParsedItem(
                 title = w.title,
                 link = w.link,
-                author = "SecurityCipher Daily",
+                author = sourceName,
                 publishedAt = w.publishedAt,
-                summary = "Daily bug bounty writeup — ${w.dateLabel}"
+                summary = if (w.dateLabel.isNotBlank()) "Writeup — ${w.dateLabel}" else "Curated writeup list"
+            )
+        }
+    }
+
+    private fun parseLinkList(text: String, sourceName: String): List<RssAtomParser.ParsedItem> {
+        return DailyWriteupParser.parsePlainUrlList(text).map { w ->
+            RssAtomParser.ParsedItem(
+                title = w.title,
+                link = w.link,
+                author = sourceName,
+                publishedAt = 0L,
+                summary = "Disclosed report / writeup link"
             )
         }
     }

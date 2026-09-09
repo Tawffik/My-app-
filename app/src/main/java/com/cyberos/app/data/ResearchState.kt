@@ -25,6 +25,11 @@ class ResearchState(
     var lastSyncAt by mutableStateOf(syncPrefs.lastSuccessAt())
         private set
 
+    init {
+        try { itemStore.seedCuratedIfNeeded() } catch (_: Exception) {}
+        items = itemStore.all()
+    }
+
     fun refresh() {
         items = itemStore.all()
         lastSyncAt = syncPrefs.lastSuccessAt()
@@ -98,6 +103,7 @@ class ResearchState(
             "Cloud",
             "Mobile",
             "AI Security",
+            "Tips",
             "Vulnerabilities",
             "CVE",
             "Threat Intelligence",

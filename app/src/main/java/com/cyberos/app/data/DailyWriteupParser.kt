@@ -25,6 +25,12 @@ object DailyWriteupParser {
     )
 
     fun parseReadme(markdown: String): List<ParsedWriteup> {
+        val dated = parseDatedLines(markdown)
+        if (dated.isNotEmpty()) return dated
+        return parseGenericMarkdownLinks(markdown)
+    }
+
+    fun parseDatedLines(markdown: String): List<ParsedWriteup> {
         val out = mutableListOf<ParsedWriteup>()
         for (line in markdown.lines()) {
             val m = LINE_RE.find(line.trim()) ?: continue
@@ -42,6 +48,41 @@ object DailyWriteupParser {
             )
         }
         return out
+    }
+
+    private val MD_LINK_RE = Regex("""\[([^\]]{3,200})\]\((https?://[^)\s]+)\)""")
+    private val PLAIN_URL_RE = Regex("""(?i)(https?://[^\s<>"']+)""")
+
+    /** Awesome-list style: - [Title](url) */
+    fun parseGenericMarkdownLinks(markdown: String): List<ParsedWriteup> {
+        val out = mutableListOf<ParsedWriteup>()
+        val seen = mutableSetOf<String>()
+        for (line in markdown.lines()) {
+            for (m in MD_LINK_RE.findAll(line)) {
+                val title = decodeEntities(m.groupValues[1].trim())
+                val link = m.groupValues[2].trim()
+                if (title.isBlank() || link in seen) continue
+                if (link.contains("github.com") && title.equals("http", true)) continue
+                seen.add(link)
+                out.add(ParsedWriteup(title, link, 0L, ""))
+            }
+        }
+        return out.take(400)
+    }
+
+    /** Flat URL lists (e.g. HackerOne disclosed reports.txt). */
+    fun parsePlainUrlList(text: String): List<ParsedWriteup> {
+        val out = mutableListOf<ParsedWriteup>()
+        val seen = mutableSetOf<String>()
+        for (line in text.lines()) {
+            val m = PLAIN_URL_RE.find(line.trim()) ?: continue
+            val link = m.groupValues[1].trim().trimEnd('.', ',', ')', ']')
+            if (link in seen) continue
+            seen.add(link)
+            val title = link.substringAfter("://").take(120)
+            out.add(ParsedWriteup(title, link, 0L, ""))
+        }
+        return out.take(300)
     }
 
     private fun decodeEntities(s: String): String =

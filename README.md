@@ -29,7 +29,7 @@ Most security “apps” are either content dumps or disconnected note tools. Cy
 | **Learning** | Multi-path curriculum including **AI Security** (prompt injection, RAG, agents, output handling, AI for bug bounty) |
 | **Review** | Spaced repetition flashcards (SM-2-style scheduling) |
 | **Notes** | Templates that force observation / hypothesis / validation / takeaway |
-| **Research** | Curated sources, vuln-type filters, Custom Tabs browser, share-to-app, daily writeup pulls |
+| **Research** | Live feeds + **curated writeup library** (BugBountyDaily-class links), Awesome-list / HackerOne archives, Tips & channel hubs, vuln filters |
 | **Bug Bounty** | Programs, assets, findings workflow, Web/Recon/API/**LLM App** checklists, Markdown report copy |
 | **AI** | Modes: Normal, Teacher, Socratic, Researcher, **AI Security Tutor**, **BB Copilot** + optional Council |
 | **Notifications** | Research sync alerts + daily digest worker (Android 13+ needs notification permission) |
