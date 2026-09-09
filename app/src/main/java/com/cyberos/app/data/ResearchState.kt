@@ -16,7 +16,7 @@ class ResearchState(
 
     var items by mutableStateOf(itemStore.all())
         private set
-    var category by mutableStateOf("All")
+    var category by mutableStateOf("Writeups")
     /** Secondary filter for vulnerability class when viewing Bug Bounty / Writeups. */
     var vulnType by mutableStateOf("All")
     var refreshing by mutableStateOf(false)
@@ -26,6 +26,11 @@ class ResearchState(
         private set
 
     init {
+        try { itemStore.seedCuratedIfNeeded() } catch (_: Exception) {}
+        items = itemStore.all()
+    }
+
+    fun reloadFromStore() {
         try { itemStore.seedCuratedIfNeeded() } catch (_: Exception) {}
         items = itemStore.all()
     }
@@ -76,9 +81,12 @@ class ResearchState(
         var base = when (category) {
             "All" -> items
             "Writeups" -> items.filter {
-                it.category == "Bug Bounty" ||
-                    it.tags.contains("writeup") ||
+                it.tags.contains("writeup") ||
+                    it.category == "Bug Bounty" ||
                     BugBountyFilters.looksLikeWriteup(it.title, it.summary)
+            }
+            "Curated" -> items.filter {
+                it.tags.contains("curated") || it.author.contains("Curated", ignoreCase = true)
             }
             else -> items.filter { it.category == category }
         }
@@ -93,24 +101,15 @@ class ResearchState(
 
     companion object {
         val CATEGORIES = listOf(
-            "All",
             "Writeups",
-            "Bug Bounty",
-            "Web Security",
-            "API Security",
-            "Authentication",
-            "Authorization",
-            "Cloud",
-            "Mobile",
-            "AI Security",
+            "Curated",
             "Tips",
+            "Bug Bounty",
+            "AI Security",
+            "Web Security",
+            "Authentication",
             "Vulnerabilities",
-            "CVE",
-            "Threat Intelligence",
-            "Pentesting",
-            "OSINT",
-            "Supply Chain",
-            "General"
+            "All"
         )
     }
 }

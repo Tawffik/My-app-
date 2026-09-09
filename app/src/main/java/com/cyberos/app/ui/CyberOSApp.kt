@@ -123,21 +123,21 @@ fun CyberOSApp() {
                         NavigationBarItem(selected = tab == 1, onClick = { tab = 1 },
                             icon = { Icon(Icons.Filled.PlayArrow, contentDescription = null) },
                             label = { Text(Lang.t("Learn", "تعلّم")) })
+                        NavigationBarItem(selected = tab == 6, onClick = { tab = 6 },
+                            icon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                            label = { Text(Lang.t("Writeups", "رايت أبز")) })
+                        NavigationBarItem(selected = tab == 4, onClick = { tab = 4 },
+                            icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
+                            label = { Text(Lang.t("Notes", "نوتس")) })
+                        NavigationBarItem(selected = tab == 5, onClick = { tab = 5 },
+                            icon = { Icon(Icons.Filled.Info, contentDescription = null) },
+                            label = { Text("AI") })
                         NavigationBarItem(selected = tab == 2, onClick = { tab = 2 },
                             icon = { Icon(Icons.Filled.Refresh, contentDescription = null) },
                             label = { Text(Lang.t("Review", "مراجعة")) })
                         NavigationBarItem(selected = tab == 3, onClick = { tab = 3 },
                             icon = { Icon(Icons.Filled.List, contentDescription = null) },
                             label = { Text(Lang.t("Tasks", "مهام")) })
-                        NavigationBarItem(selected = tab == 4, onClick = { tab = 4 },
-                            icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
-                            label = { Text(Lang.t("Notes", "ملاحظات")) })
-                        NavigationBarItem(selected = tab == 5, onClick = { tab = 5 },
-                            icon = { Icon(Icons.Filled.Info, contentDescription = null) },
-                            label = { Text("AI") })
-                        NavigationBarItem(selected = tab == 6, onClick = { tab = 6 },
-                            icon = { Icon(Icons.Filled.Search, contentDescription = null) },
-                            label = { Text(Lang.t("Research", "أبحاث")) })
                     }
                 }
             },

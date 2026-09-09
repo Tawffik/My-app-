@@ -28,7 +28,7 @@ import java.util.Locale
 @Composable
 fun ResearchScreen(state: ResearchState, onOpenItem: (Long) -> Unit) {
     val scope = rememberCoroutineScope()
-    LaunchedEffect(Unit) { state.fetchIfStale() }
+    LaunchedEffect(Unit) { state.reloadFromStore(); state.fetchIfStale() }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
         Spacer(Modifier.height(8.dp))
@@ -49,6 +49,14 @@ fun ResearchScreen(state: ResearchState, onOpenItem: (Long) -> Unit) {
                 }
             }
         }
+        Text(
+            Lang.t(
+                "Writeups library + live feeds. Open · bookmark · Add Finding.",
+                "مكتبة رايت أبز + فيدز. افتح · احفظ · أضف Finding."
+            ),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         if (state.lastSyncAt > 0L) {
             val ago = remember(state.lastSyncAt) {
                 val mins = ((System.currentTimeMillis() - state.lastSyncAt) / 60000L).toInt()

@@ -51,47 +51,61 @@ class ResearchItemStore(context: Context) {
     }
 
     
-    /** One-time seed of high-signal writeups so Research is useful before first network sync. */
+    /**
+     * Merge curated writeups + channel hubs by URL.
+     * Safe to call on every launch — only inserts missing links (never wipes user data).
+     */
     @Synchronized
     fun seedCuratedIfNeeded() {
-        val marker = "cyberos-curated-v1"
-        val already = cache.any { it.tags.contains(marker) }
-        if (already) return
+        val marker = "cyberos-curated-v2"
+        val existingLinks = cache.map { it.link.trim().lowercase() }.toHashSet()
         val now = System.currentTimeMillis()
         var id = nextId()
-        val seeded = CuratedWriteupLibrary.WRITEUPS.map { e ->
-            ResearchItem(
-                id = id++,
-                sourceId = 0L,
-                title = e.title,
-                link = e.link,
-                author = "CyberOS Curated",
-                summary = e.summary,
-                category = e.category,
-                tags = e.tags + marker,
-                vulnerabilityType = BugBountyFilters.detectVulnType(e.title, e.summary),
-                publishedAt = now,
-                retrievedAt = now
+        val toAdd = mutableListOf<ResearchItem>()
+
+        for (e in CuratedWriteupLibrary.WRITEUPS) {
+            val link = e.link.trim()
+            if (link.isEmpty() || link.lowercase() in existingLinks) continue
+            existingLinks.add(link.lowercase())
+            toAdd.add(
+                ResearchItem(
+                    id = id++,
+                    sourceId = 0L,
+                    title = e.title,
+                    link = link,
+                    author = "CyberOS Curated",
+                    summary = e.summary,
+                    category = e.category,
+                    tags = (e.tags + listOf("writeup", "curated", marker)).distinct(),
+                    vulnerabilityType = BugBountyFilters.detectVulnType(e.title, e.summary),
+                    publishedAt = now,
+                    retrievedAt = now
+                )
             )
         }
-        // Channel hints as Tips entries
-        val hints = CuratedWriteupLibrary.CHANNEL_HINTS.map { (name, url) ->
-            ResearchItem(
-                id = id++,
-                sourceId = 0L,
-                title = "Follow: $name",
-                link = url,
-                author = "CyberOS Curated",
-                summary = "Live channel / site — open in browser (not auto-synced).",
-                category = "Tips",
-                tags = listOf("tips", "channel", marker),
-                vulnerabilityType = "Other",
-                publishedAt = now,
-                retrievedAt = now
+        for ((name, url) in CuratedWriteupLibrary.CHANNEL_HINTS) {
+            val link = url.trim()
+            if (link.isEmpty() || link.lowercase() in existingLinks) continue
+            existingLinks.add(link.lowercase())
+            toAdd.add(
+                ResearchItem(
+                    id = id++,
+                    sourceId = 0L,
+                    title = "Follow: $name",
+                    link = link,
+                    author = "CyberOS Curated",
+                    summary = "Live channel / site — open in browser (not auto-synced).",
+                    category = "Tips",
+                    tags = listOf("tips", "channel", "curated", marker),
+                    vulnerabilityType = "",
+                    publishedAt = now,
+                    retrievedAt = now
+                )
             )
         }
-        cache.addAll(seeded)
-        cache.addAll(hints)
+        if (toAdd.isEmpty()) return
+        cache.addAll(toAdd)
+        while (cache.size > 1200) cache.removeAt(0)
         persist()
     }
 
