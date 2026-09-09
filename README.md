@@ -1,86 +1,123 @@
 # CyberOS
 
-**Personal Cybersecurity Learning · Research · Bug Bounty Operating System**
+**Personal Cybersecurity Learning · Research · Notes · Bug Bounty Operating System**
 
-CyberOS is an Android app built as a serious personal security workstation: structured learning, research feeds, AI-assisted analysis (with strict human-in-the-loop rules), and a bug bounty workspace — offline-first, privacy-minded, and designed for daily practice.
+[![Android CI](https://github.com/Tawffik/My-app-/actions/workflows/android.yml/badge.svg)](https://github.com/Tawffik/My-app-/actions)
+[![Release](https://img.shields.io/github/v/release/Tawffik/My-app-?include_prereleases)](https://github.com/Tawffik/My-app-/releases)
+[![License](https://img.shields.io/badge/license-Personal%20%2F%20Educational-blue)](#license)
 
-> Built for learners and practitioners who want a single place to **learn → research → practice → document → review**.
+CyberOS is an **Android** app designed as a serious personal security workstation — not a content dump.
 
----
+It combines structured learning, research feeds, an Obsidian-style notes vault, spaced repetition, AI tutors (with strict human-in-the-loop rules), and a bug bounty workspace.
 
-## Why this exists
+> **Loop:** Learn → Note → Review → Research → Apply → Report
 
-Most security “apps” are either content dumps or disconnected note tools. CyberOS is oriented around an **operational loop**:
-
-1. **Learn** — curriculum paths (Web, Android, **AI Security**, …) with sections, flashcards, and quizzes  
-2. **Research** — RSS/Atom/Markdown feeds (writeups, advisories, AI security sources) with categorization  
-3. **Practice** — SM-2 reviews, quizzes, challenges, focus sessions  
-4. **Document** — structured note templates (security, writeup digest, lab, AI security, BB session)  
-5. **Apply** — Bug Bounty workspace (programs, assets, findings, checklists, Markdown reports)  
-6. **AI assist** — Tutor / BB Copilot / researcher modes that label **hypotheses**, never silent “confirmed bugs”
+**Latest:** `v1.0.35` · Kotlin · Jetpack Compose · Offline-first
 
 ---
 
-## Feature map
+## Why it exists
 
-| Area | What you get |
-|------|----------------|
-| **Daily Brief** | One screen for today’s focus: cards due, next topic, open findings, AI security pulse |
-| **Learning** | Multi-path curriculum including **AI Security** (prompt injection, RAG, agents, output handling, AI for bug bounty) |
-| **Review** | Spaced repetition flashcards (SM-2-style scheduling) |
-| **Notes** | Templates that force observation / hypothesis / validation / takeaway |
-| **Research** | Live feeds + **curated writeup library** (BugBountyDaily-class links), Awesome-list / HackerOne archives, Tips & channel hubs, vuln filters |
-| **Bug Bounty** | Programs, assets, findings workflow, Web/Recon/API/**LLM App** checklists, Markdown report copy |
-| **AI** | Modes: Normal, Teacher, Socratic, Researcher, **AI Security Tutor**, **BB Copilot** + optional Council |
-| **Notifications** | Research sync alerts + daily digest worker (Android 13+ needs notification permission) |
+Most “security apps” are either static articles or disconnected note tools.  
+CyberOS is built around a **daily operational loop** suitable for real practice and for demonstrating product + security engineering skill in a portfolio.
 
----
-
-## Screenshots / demo flow (for portfolio)
-
-Recommended 60-second walkthrough when sharing:
-
-1. Open **Daily Brief** → show the four focus actions  
-2. Open **AI Security → Prompt Injection** topic → flashcards  
-3. Create a **Writeup Digest** note from a template  
-4. Open **Research** → filter Bug Bounty / AI Security  
-5. **Add Finding** from a writeup → fill status → **Copy Markdown Report**  
-6. Switch AI to **BB Copilot** and show the “hypothesis only” banner  
+| You need | CyberOS gives you |
+|----------|-------------------|
+| Structured study | Multi-path curriculum + quizzes + flashcards |
+| A place for knowledge | Notes vault with `[[wiki links]]`, tags, folders, graph |
+| Fresh writeups | Research feeds + curated library + Tips channels |
+| Bounty workflow | Programs, assets, findings, checklists, Markdown reports |
+| AI without false confidence | Tutor / BB Copilot that label **hypotheses**, never silent “confirmed vulns” |
 
 ---
 
-## Architecture (high level)
+## Feature overview
+
+### 1. Daily Brief
+One home ritual screen: due flashcards, next topic, findings that need attention, research / AI security pulse.
+
+### 2. Learning paths
+Built-in paths (additive; users can add custom sections):
+
+| Path | Focus |
+|------|--------|
+| **Web Security Basics** | HTTP, architecture, recon, disclosure |
+| **Authentication & Authorization** | AuthN, access control, IDOR, sessions/JWT, OAuth |
+| **Common Vulnerabilities** | SQLi, XSS, CSRF, SSRF, business logic |
+| **Android Security** | APK, manifest, components, WebView |
+| **AI Security** | LLM apps, prompt injection, RAG, agents, output handling, AI for bug bounty |
+| **Web Security BB Roadmap** | Fundamentals → JS/DOM → APIs → authz → Burp → workflow → notes system |
+| **Access Control & IDOR Tricks** | Encoding, HPP, type spoofing, path/body authority, JSON quirks |
+| **Study OS** | Daily ritual, notes that force application, open sources while studying |
+
+Each topic: sections · flashcards · quiz · **open sources in browser** · **Ask AI Tutor** · **Create study note**.
+
+### 3. Notes vault (Obsidian-inspired)
+
+| Capability | Detail |
+|------------|--------|
+| **Wiki links** | `[[Note Title]]` with outgoing links + **backlinks** |
+| **Tags** | Explicit tags + inline `#tags` |
+| **Folders** | e.g. `Bug Bounty/IDOR`, `Daily`, `MOC` |
+| **Pinned notes** | Keep hubs on top |
+| **Daily note** | One click for today’s journal |
+| **Templates** | Security · Writeup Digest · Lab · AI Security · BB Session · **MOC** · **Concept** |
+| **Graph** | Hubs, orphans, edge list (mobile-friendly) |
+| **Study mode** | Hide `A:` answers for active recall |
+| **Link picker** | Insert link to an existing note |
+| **Create from missing link** | Turn unresolved `[[Title]]` into a new note |
+| **Unlinked mentions** | Notes that mention a title without `[[]]` |
+| **Duplicate / Copy Markdown** | Fast reuse and export snippet |
+
+### 4. Research & writeups
+- Live **RSS / Atom / Markdown / URL-list** sources  
+- **Curated offline library** of high-signal writeups  
+- Aggregators: SecurityCipher daily list, Awesome Bugbounty Writeups, HackerOne disclosed archive list  
+- Categories: Writeups · Bug Bounty · Tips · AI Security · …  
+- Vuln-type filters · Custom Tabs · share-into-app · **Add Finding**  
+- Channel hubs under Tips (X / Telegram / SecurityCipher — open in browser)
+
+### 5. Bug Bounty workspace
+Programs · Assets · Findings · Checklists (Web / Recon / API / **LLM App**) · Markdown report · **AI Report Review** (hypothesis assist only)
+
+### 6. AI (optional API key)
+Modes: Normal · Teacher · Socratic · Researcher · **AI Security Tutor** · **BB Copilot** · optional Council  
+
+Rules: hypotheses until reproduced · no silent “confirmed vuln” for bounty · works offline without a key for non-AI features
+
+### 7. Review & practice
+SM-2-style flashcards · topic quizzes · card generation from notes (when AI configured)
+
+### 8. Notifications
+Research sync (~6h) · daily digest · Android 13+ permission required
+
+---
+
+## Architecture (short)
 
 ```
 app/
-  data/           # Stores (JSON offline), Research pipeline, AI client, BB models
-  learning/       # Curriculum, progress, quiz
-  flashcards/     # SM-2 scheduling
-  ui/             # Jetpack Compose screens (home, brief, research, bugbounty, ai, …)
+  data/          # JSON stores, research pipeline, AI client, BB models, WikiLinks
+  learning/      # Curriculum + custom paths + progress
+  flashcards/    # SM-2 scheduling
+  ui/            # Jetpack Compose by feature
 ```
 
-**Principles**
+Principles: offline-first · untrusted external content · no secrets in git · unit-tested pure logic · CI releases  
 
-- **Offline-first** local JSON stores (notes, research items, findings, programs, assets)  
-- **Untrusted external content** — web/writeups treated as data; redaction + RAG sanitization boundaries  
-- **No hardcoded secrets** — API keys in device vault  
-- **Testable pure logic** — filters, report generator, templates covered by unit tests  
-- **CI** — GitHub Actions builds debug APK and publishes releases  
+Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/FEATURES.md](docs/FEATURES.md)
 
 ---
 
 ## Tech stack
 
-- Kotlin · Jetpack Compose · Material 3  
-- WorkManager (research sync + daily digest)  
-- Chrome Custom Tabs (not a full in-app WebView browser)  
-- Optional OpenAI-compatible API for AI features  
+Kotlin · Jetpack Compose · Material 3 · WorkManager · Chrome Custom Tabs · optional OpenAI-compatible API · GitHub Actions
 
 ---
 
-## Build & run
+## Build & install
 
-**Requirements:** JDK 17, Android SDK 34, Android Studio or CI.
+**Requirements:** JDK 17, Android SDK 34.
 
 ```bash
 git clone https://github.com/Tawffik/My-app-.git
@@ -88,76 +125,71 @@ cd My-app-
 ./gradlew assembleDebug
 ```
 
-Install the APK from `app/build/outputs/apk/debug/` or from **GitHub Releases**.
-
-**AI (optional):** Settings → configure base URL, model, and API key (stored encrypted on device). Without a key, learning / research / BB features still work.
-
-**Notifications (optional):** Grant notification permission on Android 13+ so research and daily brief alerts can appear.
+Or install the latest APK from **[Releases](https://github.com/Tawffik/My-app-/releases)**.
 
 ---
 
-## How to use it day to day
+## Day-to-day usage
 
 | Time | Action |
 |------|--------|
-| 5–10 min | **Daily Brief** + review due cards |
-| 20–30 min | One curriculum topic (or AI Security path) |
-| 10 min | Structured note from a template → extract flashcards if useful |
-| 30+ min | Bug bounty: program/assets → findings → checklist → validated report |
-| Anytime | Research refresh; save writeups; **Add Finding** when relevant |
+| 5–10 min | Daily Brief + due cards |
+| 20–30 min | One curriculum topic + study note |
+| 10 min | Link notes / review graph orphans |
+| 30+ min | Authorized BB workflow |
+| Anytime | Research refresh · Add Finding |
 
-**Rules that keep the project professional**
-
-- AI suggestions = **hypotheses** until you reproduce them  
-- Only test systems you are **authorized** to test  
-- Do not paste secrets into AI chat  
-- Prefer evidence in findings over narrative filler  
+Full guide: [docs/USAGE.md](docs/USAGE.md)
 
 ---
 
-## Curriculum highlights
+## Interview / portfolio demo (2–3 min)
 
-- Web Security Basics  
-- Android Security topics  
-- **AI Security** — LLM apps, prompt injection, RAG/vector risks, agents & excessive agency, improper output handling, using AI responsibly in bug bounty  
-
-Aligned in spirit with industry awareness materials such as **OWASP GenAI / LLM Top 10** concepts (educational framing inside the app).
-
----
-
-## Roadmap (honest)
-
-**Done (foundation → operational loop)**  
-Stabilize · Research foundation · Secure browser/share · BB workspace MVP · Notifications MVP · Daily Brief · Note templates · AI Security track · AI Tutor / BB Copilot  
-
-**Next (portfolio polish / depth)**  
-- Primary navigation simplification (fewer bottom tabs)  
-- AI Report Reviewer on validated findings  
-- Stronger backup/restore coverage for all BB/research stores  
-- Deeper recommendations (what to study next from your weak areas)  
+1. **Daily Brief** — operational loop  
+2. **Learn** — topic + open source  
+3. **Notes** — `[[wiki link]]` + Graph  
+4. **Research** — Writeups filter  
+5. **Finding** — Markdown report + AI review as *hypothesis assist*  
+6. Line: *“AI drafts; I verify before any submission. Only authorized targets.”*
 
 ---
 
 ## Security & ethics
 
-CyberOS is for **education and authorized security research**.  
-Do not use it to attack systems without permission.  
-AI features are designed to refuse inventing CVEs/sources and to stress human verification for bounty submissions.
+Educational / personal research only. Test systems you own or are authorized to test. See [SECURITY.md](SECURITY.md).
+
+---
+
+## Roadmap (honest)
+
+**Done:** research pipeline · BB workspace · AI modes · Daily Brief · notes vault · writeup library · BB roadmap & access-control curriculum · CI  
+
+**Next candidates:** fewer primary tabs · full backup/restore · stronger finding “next action” · optional Markdown preview  
+
+---
+
+## Documentation
+
+| Doc | Purpose |
+|-----|---------|
+| [USAGE.md](docs/USAGE.md) | How to use + demo script |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical structure |
+| [FEATURES.md](docs/FEATURES.md) | Feature checklist |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution rules |
+| [SECURITY.md](SECURITY.md) | Security expectations |
 
 ---
 
 ## Author
 
-Built as a personal engineering + security practice project — suitable to demonstrate:
+Built as a **personal engineering + security practice** project by [Tawfik](https://github.com/Tawffik).
 
-- Android / Kotlin product structure  
-- Security-minded UX (hypothesis vs confirmed, untrusted content)  
-- Domain depth (web, Android, AI/LLM risks, bug bounty workflow)  
+Demonstrates: Android/Kotlin product structure · security-minded UX · web/Android/AI domain depth · research ingestion · offline-first design.
 
-Repository: [github.com/Tawffik/My-app-](https://github.com/Tawffik/My-app-)
+Repo: [github.com/Tawffik/My-app-](https://github.com/Tawffik/My-app-)
 
 ---
 
 ## License
 
-Personal / educational project. Add an explicit license file if you open the repo publicly for wider contribution.
+Personal / educational project. Add an explicit open-source license if you invite public contributions.

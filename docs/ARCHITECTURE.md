@@ -1,55 +1,47 @@
-# CyberOS — Architecture Notes
+# CyberOS — Architecture
 
-## Modules (logical)
+## Layout
 
-| Package | Responsibility |
-|---------|----------------|
-| `data` | Persistence, research pipeline, AI client, bug bounty models, notifications |
-| `learning` | Curriculum graph, progress, quiz state |
-| `flashcards` | Card store + due scheduling |
-| `ui.*` | Compose UI by feature area |
+| Area | Responsibility |
+|------|----------------|
+| `data/` | Persistence, research pipeline, AI client, bug bounty models, WikiLinks, notifications |
+| `learning/` | Curriculum (`CyberCurriculum`, `LearningExtras`), custom paths, progress, quiz |
+| `flashcards/` | Card store + SM-2-style scheduling |
+| `ui/` | Compose UI by feature |
 
 ## Persistence
 
-Offline-first JSON files under app private storage, for example:
+Offline-first JSON under app private storage: notes, research, bug bounty entities, checklists, custom learning paths, progress/XP.
 
-- notes, tasks, projects  
-- research items / sources  
-- bug bounty programs, findings, assets  
-- checklist progress (shared preferences)  
+## Notes model
 
-Suitable for a personal OS scale; Room can be introduced later if item counts grow large.
+`WikiLinks` extracts `[[targets]]` and `#tags`. Backlinks and graph edges are derived at runtime.
 
 ## Research pipeline
 
-1. `ResearchSourceStore` seeds Tier-1/Tier-2 sources (merge-on-upgrade by URL)  
-2. `ResearchFetcher` pulls RSS/Atom or Markdown indexes  
-3. Categorization + optional vulnerability typing (`BugBountyFilters`)  
-4. `ResearchSyncWorker` (WorkManager, ~6h, network required)  
-5. UI filters + detail + Custom Tabs  
+1. Seed/merge default sources  
+2. Fetch RSS/Atom, MARKDOWN lists, or LINKLIST archives  
+3. Categorize + vuln type + dedupe  
+4. One-time curated writeup seed  
+5. `ResearchSyncWorker` (~6h)  
+
+## Learning model
+
+```
+CyberCurriculum.paths
+  + LearningExtras (+ More topics)
+  + CustomPathStore
+= allPaths()
+```
 
 ## AI boundary
 
-- API key in `ApiKeyVault` (device-side)  
-- Agent system prompts in `Agents` (tutor / copilot / council / card gen)  
-- Chat modes in `ChatMode`  
-- Untrusted note/web context expected to be wrapped/sanitized before model use  
-- Outputs treated as **assistive**, not authoritative findings  
+Device-side API key vault. Modes stress hypothesis vs confirmed. Non-AI features work without a key.
 
 ## Bug bounty domain
 
-```
-Program → Assets
-       → Findings (status, severity, evidence fields, linked research ids)
-Checklists (Web / Recon / API / LLM App)
-Report = Markdown generator from finding fields
-```
-
-## Background work
-
-- `ResearchSyncWorker` — feed refresh + optional notification  
-- `DailyDigestWorker` — 24h local briefing notification  
+Program → Assets → Findings; checklists; Markdown report from finding fields.
 
 ## CI
 
-GitHub Actions: test + assemble + release APK on `main`.
+GitHub Actions on `main`: tests + assembleDebug + release APK when configured.

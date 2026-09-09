@@ -1,114 +1,84 @@
-# CyberOS — User Guide
+# CyberOS — User guide
 
-Short guide for daily use and for demoing the app in interviews.
+For daily practice and for demoing the app when sharing the repo or interviewing.
 
-## First launch
+## Install
 
-1. Install the latest APK from **GitHub Releases**.  
-2. Open the app → **Home**.  
-3. (Optional) **Settings → AI** — set API base URL, model, and key.  
-4. (Optional) Allow **notifications** when the system asks (Android 13+).  
+1. Download the latest APK from [GitHub Releases](https://github.com/Tawffik/My-app-/releases), or build with `./gradlew assembleDebug`.
+2. Open the app → **Home / Daily Brief**.
+3. Optional: **Settings → AI** (base URL, model, API key).
+4. Optional: allow **notifications** (Android 13+).
 
-Learning, notes, research storage, and bug bounty modules work **without** AI.
+Learning, notes, research storage, and bug bounty work **without** AI.
 
 ## Daily Brief
-
-**Home → Open Brief**
-
-Use it as a checklist, not a dashboard to ignore:
 
 1. Review due flashcards  
 2. Continue the next incomplete topic  
 3. Open findings that still need attention  
-4. Run an **AI Security** tutor session when you are on that track  
-
-Then skim **Recent writeups** / **AI Security pulse** and open Research if something matters.
+4. Skim research / AI security pulse  
 
 ## Learning
 
 **Learn** tab → pick a path → open a topic.
 
-Each topic is structured as:
+Recommended tracks:
 
-- Sections (concept → why → hands-on → takeaways)  
-- Flashcards  
-- Quiz  
+- New to web security → **Web Security BB Roadmap** then **Web Security Basics**  
+- Access control deep dive → **Access Control & IDOR Tricks**  
+- Modern surface → **AI Security**  
 
-**AI Security path** (recommended modern track):
+On each topic: read sections · open **sources** · **Create study note** · **Complete** · optional quiz + AI Tutor.
 
-- LLM Application Basics  
-- Prompt Injection  
-- RAG & Vector Security  
-- Agents, Tools & Excessive Agency  
-- Improper Output Handling  
-- Using AI in Bug Bounty  
+**Add my section** creates a personal path stored on device.
 
-Mark topics complete as you finish; progress feeds streak/XP and Daily Brief.
+## Notes vault
 
-## Notes (structured)
+| Action | How |
+|--------|-----|
+| Template | Chip row (MOC, Concept, Security, …) |
+| Daily | **Daily** button |
+| Graph | **Graph** — hubs, orphans, edges |
+| Link notes | `[[Exact Title]]` in the body |
+| Tags | `#tag` in body or Tags field |
+| Folders | e.g. `Bug Bounty/IDOR` |
+| Study | **Study** hides answer lines starting with `A:` |
+| Missing link | Outgoing link → **Create** |
+| Insert link | **Link note** picker |
 
-**Notes** tab → choose a **template** chip (do not start from a blank page when learning):
-
-| Template | Use when |
-|----------|----------|
-| Security Note | Any technical observation |
-| Writeup Digest | After reading a public writeup |
-| Lab Session | After a lab/challenge |
-| AI Security Note | LLM/RAG/agent notes |
-| Bug Bounty Session | End of a hunting session |
-
-Always separate **Observation (facts)** from **Hypothesis (unverified)**.
-
-From a note you can:
-
-- Ask AI to analyze (key required)  
-- Generate flashcards  
+Suggested structure: MOC note linking `[[IDOR]]`, `[[HPP]]`, concept notes.
 
 ## Research
 
-**Research** tab:
+Refresh → filter **Writeups** / **Tips** / **AI Security** → open in browser → **Add Finding** when relevant.
 
-- Pull feeds (manual refresh + background sync about every 6 hours)  
-- Filter by category (Bug Bounty, AI Security, …) and vulnerability type when relevant  
-- Open items in **Chrome Custom Tabs**  
-- Share text/links into CyberOS from other apps when configured  
+Curated items appear even before the first successful network sync.
 
-From an item detail: **Add Finding** links the writeup into the bug bounty workspace.
+## Bug Bounty
 
-## Bug Bounty workspace
-
-**Home → Bug Bounty Workspace**
-
-1. **Programs** — add the program you are authorized to test  
-2. **Assets** — domains/URLs/APIs in scope  
-3. **Findings** — status workflow from Idea → … → Submitted  
-4. **Checklists** — Web / Recon / API / **LLM App**  
-5. On a finding: **Copy Markdown Report** after you have real evidence  
-
-Never paste production secrets into notes or AI chat.
+1. Add **Program** (authorized only)  
+2. Add **Assets**  
+3. **Findings** + status  
+4. Checklists (including **LLM App**)  
+5. **Copy Markdown Report**  
+6. Optional **AI Report Review** — triage help, not proof  
 
 ## AI modes
 
-**AI** tab — mode chips:
-
-| Mode | Intent |
-|------|--------|
-| Normal | General help |
-| Teacher | Step-by-step teaching |
-| Socratic | Questions first |
+| Mode | Use for |
+|------|---------|
+| AI Security | Learning LLM risks |
+| BB Copilot | Hypothesis drafting + validation reminders |
+| Teacher / Socratic | Study dialogue |
 | Researcher | Structured analysis |
-| **AI Security** | Teach LLM risks (authorized learning) |
-| **BB Copilot** | Bounty hypotheses + validation reminders |
 
-Banners under AI Security / BB Copilot exist on purpose: **no silent “confirmed vulnerability” claims**.
+Never treat model output as a confirmed vulnerability.
 
-## Interview demo script (2–3 minutes)
+## Demo script (2–3 minutes)
 
-1. Show **Daily Brief** and explain the learn→research→apply loop.  
-2. Open **AI Security → Prompt Injection** and one quiz question.  
-3. Show a **template note** with hypothesis clearly labeled.  
-4. Show **Research** filters and a writeup.  
-5. Show a **Finding** + Markdown report.  
-6. Show **BB Copilot** mode and say: “AI drafts; I verify before submit.”  
-
-That narrative matches how strong security engineering teams actually work.
+1. Daily Brief  
+2. One learning topic + source link  
+3. Note with `[[link]]` + Graph  
+4. Research writeup  
+5. Finding + Markdown report  
+6. Say: **“AI drafts; I verify. Authorized targets only.”**
