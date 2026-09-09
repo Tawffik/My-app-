@@ -5,7 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,6 +26,7 @@ fun HomeScreen(
     onOpenTopic: (String) -> Unit,
     onGoReview: () -> Unit,
     onGoNotes: () -> Unit,
+    onGoTasks: () -> Unit = {},
     onOpenMethodologies: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenFocus: () -> Unit,
@@ -48,8 +50,7 @@ fun HomeScreen(
     val dueNow = cardStore.countDue(System.currentTimeMillis())
     val totalTopics = CyberCurriculum.totalTopics()
     val nextTopic = CyberCurriculum.firstIncompleteTopic { progress.isCompleted(it) }
-    val aiNext = CyberCurriculum.findTopic("prompt-injection")?.takeIf { !progress.isCompleted(it.id) }
-        ?: CyberCurriculum.findTopic("llm-basics")
+    val openTasks = tasks.count { it.status != "Done" && it.status != "done" }
 
     Column(
         Modifier
@@ -61,29 +62,31 @@ fun HomeScreen(
             Column(Modifier.weight(1f)) {
                 Text(greeting, style = MaterialTheme.typography.headlineMedium)
                 Text(
-                    "CyberOS · Learn · Research · Practice",
+                    "CyberOS · Learn → Research → Apply",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            IconButton(onClick = onOpenSearch) { Icon(Icons.Filled.Search, contentDescription = null) }
-            IconButton(onClick = onOpenSettings) { Icon(Icons.Filled.Settings, contentDescription = null) }
+            IconButton(onClick = onOpenSearch) {
+                Icon(Icons.Filled.Search, contentDescription = "Search")
+            }
+            IconButton(onClick = onOpenSettings) {
+                Icon(Icons.Filled.Settings, contentDescription = "Settings")
+            }
         }
         Spacer(Modifier.height(12.dp))
 
-        // Daily Brief hero
+        // Hero: Daily Brief
         Card(
-            Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onOpenBrief),
+            Modifier.fillMaxWidth().clickable(onClick = onOpenBrief),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
             Column(Modifier.padding(16.dp)) {
                 Text(Lang.t("Daily Brief", "Daily Brief"), style = MaterialTheme.typography.titleLarge)
                 Text(
                     Lang.t(
-                        "Your focused path for today — learn, research, practice.",
-                        "Your focused path for today — learn, research, practice."
+                        "Today’s focus: cards, topic, findings, writeups.",
+                        "تركيز اليوم: كروت، موضوع، findings، رايت أبز."
                     ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -94,105 +97,143 @@ fun HomeScreen(
         }
         Spacer(Modifier.height(12.dp))
 
+        // Stats row
         Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(16.dp)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    StatChip("🔥", "${progress.streak}", "Streak")
-                    StatChip("⭐", "${progress.xp}", "XP")
-                    StatChip("🃏", "$dueNow", "Due")
-                    StatChip("📚", "${progress.completedCount}/$totalTopics", "Topics")
-                }
+            Row(
+                Modifier.fillMaxWidth().padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                StatChip("🔥", "${progress.streak}", "Streak")
+                StatChip("⭐", "${progress.xp}", "XP")
+                StatChip("🃏", "$dueNow", "Due")
+                StatChip("📚", "${progress.completedCount}/$totalTopics", "Topics")
             }
         }
         Spacer(Modifier.height(12.dp))
 
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(16.dp)) {
-                Text(Lang.t("Continue Learning", "Continue Learning"), style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(8.dp))
-                if (nextTopic == null) {
-                    Text(Lang.t("All topics complete — review or start AI Security.", "All topics complete — review or start AI Security."))
-                    Spacer(Modifier.height(8.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = onGoReview) { Text("Review") }
-                        OutlinedButton(onClick = {
-                            aiNext?.let { onOpenTopic(it.id) }
-                        }) { Text("AI Security") }
-                    }
-                } else {
-                    Text(nextTopic.title, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
-                    Text(nextTopic.summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.height(12.dp))
-                    Button(onClick = { onOpenTopic(nextTopic.id) }) { Text(Lang.t("Open", "Open")) }
-                }
-            }
-        }
-        Spacer(Modifier.height(12.dp))
-
+        // Primary destinations
+        Text(Lang.t("Workspace", "Workspace"), style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Card(Modifier.weight(1f).clickable(onClick = onOpenResearch)) {
-                Column(Modifier.padding(14.dp)) {
-                    Text("Research", style = MaterialTheme.typography.titleSmall)
-                    Text("$researchPulse new", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            Card(Modifier.weight(1f).clickable(onClick = onOpenBugBounty)) {
-                Column(Modifier.padding(14.dp)) {
-                    Text("Bug Bounty", style = MaterialTheme.typography.titleSmall)
-                    Text("$openFindingsCount open", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
+            HubCard(
+                title = Lang.t("Research", "Research"),
+                subtitle = if (researchPulse > 0) "$researchPulse new" else "Writeups",
+                onClick = onOpenResearch,
+                modifier = Modifier.weight(1f)
+            )
+            HubCard(
+                title = Lang.t("Bug Bounty", "Bug Bounty"),
+                subtitle = if (openFindingsCount > 0) "$openFindingsCount open" else "Programs",
+                onClick = onOpenBugBounty,
+                modifier = Modifier.weight(1f)
+            )
         }
         Spacer(Modifier.height(8.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Card(Modifier.weight(1f).clickable(onClick = onOpenAiTutor)) {
-                Column(Modifier.padding(14.dp)) {
-                    Text("AI Tutor", style = MaterialTheme.typography.titleSmall)
-                    Text("LLM attacks", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            Card(Modifier.weight(1f).clickable(onClick = onGoNotes)) {
-                Column(Modifier.padding(14.dp)) {
-                    Text("Notes", style = MaterialTheme.typography.titleSmall)
-                    Text("Templates", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            HubCard(
+                title = "AI Tutor",
+                subtitle = "Learn safely",
+                onClick = onOpenAiTutor,
+                modifier = Modifier.weight(1f)
+            )
+            HubCard(
+                title = Lang.t("Notes", "Notes"),
+                subtitle = "Wiki vault",
+                onClick = onGoNotes,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Spacer(Modifier.height(16.dp))
+
+        // Continue learning
+        Text(Lang.t("Continue", "Continue"), style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        Card(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp)) {
+                if (nextTopic != null) {
+                    Text(nextTopic.title, style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        nextTopic.summary,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = { onOpenTopic(nextTopic.id) }) {
+                        Text(Lang.t("Open topic", "Open topic"))
+                    }
+                } else {
+                    Text(
+                        Lang.t("All current topics complete — pick a path in Learn.", "كل المواضيع مكتملة — اختار مسار من تعلّم."),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp))
 
+        // Practice secondary
+        Text(Lang.t("Practice", "Practice"), style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
         Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(16.dp)) {
-                Text(Lang.t("Practice", "Practice"), style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(8.dp))
+            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Button(onClick = onGoReview, modifier = Modifier.fillMaxWidth()) {
-                    Text(Lang.t("Review flashcards", "Review flashcards") + if (dueNow > 0) " ($dueNow)" else "")
+                    Text(
+                        Lang.t("Review flashcards", "Review flashcards") +
+                            if (dueNow > 0) " ($dueNow)" else ""
+                    )
                 }
-                Spacer(Modifier.height(6.dp))
+                OutlinedButton(onClick = onGoTasks, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        Lang.t("Tasks", "Tasks") +
+                            if (openTasks > 0) " ($openTasks)" else ""
+                    )
+                }
                 OutlinedButton(onClick = onOpenQuiz, modifier = Modifier.fillMaxWidth()) {
                     Text(Lang.t("Mixed Quiz", "Mixed Quiz"))
                 }
-                Spacer(Modifier.height(6.dp))
                 OutlinedButton(onClick = onOpenChallenge, modifier = Modifier.fillMaxWidth()) {
-                    Text(Lang.t("Challenge Mode", "Challenge Mode"))
+                    Text(Lang.t("Challenge", "Challenge"))
                 }
-                Spacer(Modifier.height(6.dp))
                 OutlinedButton(onClick = onOpenFocus, modifier = Modifier.fillMaxWidth()) {
                     Text(Lang.t("Focus Session", "Focus Session"))
                 }
+                OutlinedButton(onClick = onOpenMethodologies, modifier = Modifier.fillMaxWidth()) {
+                    Text(Lang.t("Methodologies", "Methodologies"))
+                }
             }
-        }
-        Spacer(Modifier.height(12.dp))
-        OutlinedButton(onClick = onOpenMethodologies, modifier = Modifier.fillMaxWidth()) {
-            Text(Lang.t("Methodologies", "Methodologies"))
         }
         Spacer(Modifier.height(24.dp))
     }
 }
 
 @Composable
+private fun HubCard(
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(modifier.clickable(onClick = onClick)) {
+        Column(Modifier.padding(14.dp)) {
+            Text(title, style = MaterialTheme.typography.titleSmall)
+            Text(
+                subtitle,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
 private fun StatChip(emoji: String, value: String, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("$emoji $value", style = MaterialTheme.typography.titleLarge)
-        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("$emoji $value", style = MaterialTheme.typography.titleMedium)
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

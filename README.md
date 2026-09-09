@@ -12,7 +12,7 @@ It combines structured learning, research feeds, an Obsidian-style notes vault, 
 
 > **Loop:** Learn → Note → Review → Research → Apply → Report
 
-**Latest:** `v1.0.35` · Kotlin · Jetpack Compose · Offline-first
+**Latest:** `v1.0.37` · Kotlin · Jetpack Compose · Offline-first
 
 ---
 
@@ -32,6 +32,10 @@ CyberOS is built around a **daily operational loop** suitable for real practice 
 ---
 
 ## Feature overview
+
+### 0. Navigation
+Primary bottom bar: **Home · Learn · Research · Notes · AI**  
+Review, Tasks, Bug Bounty, Methodologies open from **Home** (keeps the bar uncluttered).
 
 ### 1. Daily Brief
 One home ritual screen: due flashcards, next topic, findings that need attention, research / AI security pulse.

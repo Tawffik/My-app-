@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -104,50 +105,61 @@ fun CyberOSApp() {
     var bbChecklistOpen by rememberSaveable { mutableStateOf(false) }
     var bbAssetsProgramId by rememberSaveable { mutableStateOf(0L) }
     var briefOpen by rememberSaveable { mutableStateOf(false) }
+    var reviewOpen by rememberSaveable { mutableStateOf(false) }
+    var tasksOpen by rememberSaveable { mutableStateOf(false) }
     var noteTemplateId by rememberSaveable { mutableStateOf("") }
 
     val overlayOpen = editingId != 0L || notesGraphOpen || openTopicId.isNotEmpty() ||
         methListOpen || methOpenId != 0L || aiSettingsOpen || settingsOpen || graphOpen ||
         taskEditId != 0L || projectOpenId != 0L || searchOpen || focusOpen ||
-        cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L || bbOpen || bbFindingId != 0L || bbProgramId != 0L || bbChecklistOpen || bbAssetsProgramId != 0L || briefOpen
+        cardGenOpen || quizOpen != null || challengeOpen || researchOpenId != 0L || bbOpen || bbFindingId != 0L || bbProgramId != 0L || bbChecklistOpen || bbAssetsProgramId != 0L || briefOpen || reviewOpen || tasksOpen
+
+    LaunchedEffect(Unit) { if (tab !in 0..4) tab = 0 }
 
     CyberTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
                 if (!overlayOpen) {
+                    // Primary IA: Home · Learn · Research · Notes · AI
                     NavigationBar {
-                        NavigationBarItem(selected = tab == 0, onClick = { tab = 0 },
+                        NavigationBarItem(
+                            selected = tab == 0,
+                            onClick = { tab = 0 },
                             icon = { Icon(Icons.Filled.Home, contentDescription = null) },
-                            label = { Text(Lang.t("Home", "الرئيسية")) })
-                        NavigationBarItem(selected = tab == 1, onClick = { tab = 1 },
+                            label = { Text(Lang.t("Home", "الرئيسية")) }
+                        )
+                        NavigationBarItem(
+                            selected = tab == 1,
+                            onClick = { tab = 1 },
                             icon = { Icon(Icons.Filled.PlayArrow, contentDescription = null) },
-                            label = { Text(Lang.t("Learn", "تعلّم")) })
-                        NavigationBarItem(selected = tab == 6, onClick = { tab = 6 },
+                            label = { Text(Lang.t("Learn", "تعلّم")) }
+                        )
+                        NavigationBarItem(
+                            selected = tab == 2,
+                            onClick = { tab = 2 },
                             icon = { Icon(Icons.Filled.Search, contentDescription = null) },
-                            label = { Text(Lang.t("Writeups", "رايت أبز")) })
-                        NavigationBarItem(selected = tab == 4, onClick = { tab = 4 },
+                            label = { Text(Lang.t("Research", "أبحاث")) }
+                        )
+                        NavigationBarItem(
+                            selected = tab == 3,
+                            onClick = { tab = 3 },
                             icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
-                            label = { Text(Lang.t("Notes", "نوتس")) })
-                        NavigationBarItem(selected = tab == 5, onClick = { tab = 5 },
-                            icon = { Icon(Icons.Filled.Info, contentDescription = null) },
-                            label = { Text("AI") })
-                        NavigationBarItem(selected = tab == 2, onClick = { tab = 2 },
-                            icon = { Icon(Icons.Filled.Refresh, contentDescription = null) },
-                            label = { Text(Lang.t("Review", "مراجعة")) })
-                        NavigationBarItem(selected = tab == 3, onClick = { tab = 3 },
-                            icon = { Icon(Icons.Filled.List, contentDescription = null) },
-                            label = { Text(Lang.t("Tasks", "مهام")) })
+                            label = { Text(Lang.t("Notes", "نوتس")) }
+                        )
+                        NavigationBarItem(
+                            selected = tab == 4,
+                            onClick = { tab = 4 },
+                            icon = { Icon(Icons.Filled.Star, contentDescription = null) },
+                            label = { Text("AI") }
+                        )
                     }
                 }
             },
             floatingActionButton = {
                 if (!overlayOpen) {
                     when (tab) {
-                        3 -> FloatingActionButton(onClick = { taskEditId = -1L }) {
-                            Icon(Icons.Filled.Add, contentDescription = null)
-                        }
-                        4 -> FloatingActionButton(onClick = { editingId = -1L }) {
+                        3 -> FloatingActionButton(onClick = { editingId = -1L }) {
                             Icon(Icons.Filled.Add, contentDescription = null)
                         }
                     }
@@ -183,7 +195,7 @@ fun CyberOSApp() {
                         onAskAi = { t, b ->
                             aiState.pendingQuestion = "حلّل الملاحظة دي أمنيًا وصحّح أي معلومة."
                             aiState.pendingContext = "Title: $t\n\nContent:\n$b"
-                            editingId = 0L; aiMode = 0; tab = 5
+                            editingId = 0L; aiMode = 0; tab = 4
                         },
                         onGenerateCards = { t, b ->
                             cardGenSource = "Title: $t\n\n$b"; editingId = 0L; cardGenOpen = true
@@ -233,7 +245,7 @@ fun CyberOSApp() {
                             aiState.pendingQuestion = q
                             openTopicId = ""
                             aiMode = 0
-                            tab = 5
+                            tab = 4
                         },
                         onOpenTopic = { openTopicId = it },
                         onOpenQuiz = { tid -> quizState.startForTopic(tid); quizOpen = tid },
@@ -300,7 +312,7 @@ fun CyberOSApp() {
                         progress = progressState, cardStore = cardStore,
                         tasks = taskState.tasks,
                         onOpenTopic = { openTopicId = it },
-                        onGoReview = { tab = 2 }, onGoNotes = { tab = 4 },
+                        onGoReview = { reviewOpen = true }, onGoTasks = { tasksOpen = true }, onGoNotes = { tab = 3 },
                         onOpenMethodologies = { methListOpen = true },
                         onOpenSearch = { searchOpen = true },
                         onOpenFocus = { focusOpen = true },
@@ -312,9 +324,9 @@ fun CyberOSApp() {
                         onOpenAiTutor = {
                             aiState.mode = ChatMode.AI_TUTOR
                             aiMode = 0
-                            tab = 5
+                            tab = 4
                         },
-                        onOpenResearch = { tab = 6 },
+                        onOpenResearch = { tab = 2 },
                         openFindingsCount = bugBountyState.findings.count {
                             it.status !in listOf("Closed", "Resolved", "Duplicate", "N/A", "Submitted", "Triaged")
                         },
@@ -341,17 +353,17 @@ fun CyberOSApp() {
                             }.take(8)
                         ),
                         onBack = { briefOpen = false },
-                        onReview = { briefOpen = false; tab = 2 },
+                        onReview = { briefOpen = false; reviewOpen = true },
                         onOpenTopic = { briefOpen = false; openTopicId = it },
                         onOpenBugBounty = { briefOpen = false; bbOpen = true },
-                        onOpenResearch = { briefOpen = false; tab = 6 },
+                        onOpenResearch = { briefOpen = false; tab = 2 },
                         onOpenAiTutor = {
                             briefOpen = false
                             aiState.mode = ChatMode.AI_TUTOR
                             aiMode = 0
-                            tab = 5
+                            tab = 4
                         },
-                        onOpenNotes = { briefOpen = false; tab = 4 }
+                        onOpenNotes = { briefOpen = false; tab = 3 }
                     )
                     tab == 1 -> LearningScreen(
                         progress = progressState,
@@ -360,14 +372,44 @@ fun CyberOSApp() {
                         customStore = customPathStore,
                         onCustomChanged = { }
                     )
-                    tab == 2 -> ReviewScreen(review = reviewState, progress = progressState)
-                    tab == 3 -> TasksScreen(
-                        state = taskState, projectState = projectState,
-                        progress = progressState,
-                        onOpenTask = { id -> taskEditId = id },
-                        onOpenProject = { id -> projectOpenId = id }
+                    reviewOpen -> Column(Modifier.fillMaxSize()) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TextButton(onClick = { reviewOpen = false }) {
+                                Text(Lang.t("Back", "رجوع"))
+                            }
+                            Text(Lang.t("Review", "مراجعة"), style = MaterialTheme.typography.titleMedium)
+                        }
+                        ReviewScreen(review = reviewState, progress = progressState)
+                    }
+                    tasksOpen -> Column(Modifier.fillMaxSize()) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TextButton(onClick = { tasksOpen = false }) {
+                                Text(Lang.t("Back", "رجوع"))
+                            }
+                            Text(Lang.t("Tasks", "مهام"), style = MaterialTheme.typography.titleMedium)
+                            Spacer(Modifier.weight(1f))
+                            TextButton(onClick = { taskEditId = -1L }) {
+                                Text(Lang.t("New", "جديد"))
+                            }
+                        }
+                        TasksScreen(
+                            state = taskState, projectState = projectState,
+                            progress = progressState,
+                            onOpenTask = { id -> taskEditId = id },
+                            onOpenProject = { id -> projectOpenId = id }
+                        )
+                    }
+                    tab == 2 -> ResearchScreen(
+                        state = researchState,
+                        onOpenItem = { id -> researchOpenId = id }
                     )
-                    tab == 4 -> NotesScreen(
+                    tab == 3 -> NotesScreen(
                         state = notesState,
                         onOpen = { id -> editingId = id },
                         onOpenTemplate = { tid -> noteTemplateId = tid; editingId = -1L },
@@ -410,7 +452,7 @@ fun CyberOSApp() {
                             bbPrefillVuln = ""
                             bbLinkedResearchId = 0L
                             aiMode = 0
-                            tab = 5
+                            tab = 4
                         }
                     )
                     bbProgramId != 0L -> ProgramEditScreen(
@@ -437,11 +479,7 @@ fun CyberOSApp() {
                         onOpenChecklists = { bbOpen = false; bbChecklistOpen = true },
                         onOpenAssets = { pid -> bbOpen = false; bbAssetsProgramId = pid }
                     )
-                    tab == 6 -> ResearchScreen(
-                        state = researchState,
-                        onOpenItem = { id -> researchOpenId = id }
-                    )
-                    else -> Column(Modifier.fillMaxSize()) {
+                    tab == 4 -> Column(Modifier.fillMaxSize()) {
                         Row(
                             Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -455,6 +493,13 @@ fun CyberOSApp() {
                             } else {
                                 CouncilScreen(state = councilState, progress = progressState, onOpenSettings = { aiSettingsOpen = true })
                             }
+                        }
+                    }
+                    else -> {
+                        // Recover from legacy tab indices after IA change
+                        LaunchedEffect(tab) { if (tab !in 0..4) tab = 0 }
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
                         }
                     }
                 }
