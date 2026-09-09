@@ -35,7 +35,8 @@ fun DailyBriefScreen(
     onOpenBugBounty: () -> Unit,
     onOpenResearch: () -> Unit,
     onOpenAiTutor: () -> Unit,
-    onOpenNotes: () -> Unit
+    onOpenNotes: () -> Unit,
+    onStartToday: () -> Unit = {}
 ) {
     Column(
         Modifier
@@ -54,7 +55,11 @@ fun DailyBriefScreen(
                 )
             }
         }
+                Button(onClick = onStartToday, modifier = Modifier.fillMaxWidth()) {
+            Text(Lang.t("Start today — focused loop", "ابدأ اليوم — حلقة مركّزة"))
+        }
         Spacer(Modifier.height(12.dp))
+Spacer(Modifier.height(12.dp))
 
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp)) {

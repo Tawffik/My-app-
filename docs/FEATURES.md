@@ -1,10 +1,16 @@
 # CyberOS — Feature checklist
 
-Complete inventory of shipped capabilities (v1.0.35+). Useful for README readers, demos, and CV bullet mapping.
+Complete inventory of shipped capabilities (v1.1.0). Useful for README readers, demos, and CV bullet mapping.
 
 ## Core loop
 
-- [x] Daily Brief (due cards, next topic, findings, research pulse)
+- [x] Daily Brief
+- [x] Start today focused loop (+XP)
+- [x] Full backup v3 (research + BB + paths)
+- [x] Finding next-action + Needs action filter
+- [x] Note → Finding
+- [x] Note Preview mode
+- [x] Reload curated writeups (due cards, next topic, findings, research pulse)
 - [x] Offline-first local storage
 - [x] English UI default (Arabic strings where wired via Lang)
 - [x] GitHub Actions CI + APK releases

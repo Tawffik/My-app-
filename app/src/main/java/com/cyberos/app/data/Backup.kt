@@ -59,6 +59,13 @@ object Backup {
                 }
             }
             put("files", files)
+            // Checklist progress lives in SharedPreferences
+            try {
+                val prefs = context.getSharedPreferences("bb_checklists", Context.MODE_PRIVATE)
+                val prefObj = JSONObject()
+                prefs.all.forEach { (k, v) -> prefObj.put(k, v.toString()) }
+                put("prefs_bb_checklists", prefObj)
+            } catch (_: Exception) {}
         }
         context.contentResolver.openOutputStream(uri)?.use {
             it.write(json.toString().toByteArray(Charsets.UTF_8))
@@ -93,6 +100,15 @@ object Backup {
                 projects.replaceAll(root.optString("projects", "[]"))
             }
             if (v >= 3) {
+                root.optJSONObject("prefs_bb_checklists")?.let { prefObj ->
+                    try {
+                        val prefs = context.getSharedPreferences("bb_checklists", Context.MODE_PRIVATE).edit()
+                        prefObj.keys().forEach { k ->
+                            prefs.putString(k, prefObj.optString(k))
+                        }
+                        prefs.apply()
+                    } catch (_: Exception) {}
+                }
                 val files = root.optJSONObject("files")
                 if (files != null) {
                     EXTRA_FILES.forEach { name ->

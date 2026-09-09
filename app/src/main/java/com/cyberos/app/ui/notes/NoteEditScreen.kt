@@ -39,6 +39,7 @@ fun NoteEditScreen(
     var folder by remember(note?.id) { mutableStateOf(note?.folder ?: "") }
     var pinned by remember(note?.id) { mutableStateOf(note?.pinned ?: false) }
     var showLinkPicker by remember { mutableStateOf(false) }
+    var preview by remember { mutableStateOf(false) }
     var studyHide by remember { mutableStateOf(false) }
     val linksInNote = remember(body) { WikiLinks.extractTargets(body) }
     val backlinks = remember(note?.id, title, allNotes) {
@@ -132,7 +133,24 @@ fun NoteEditScreen(
             )
         }
         Spacer(Modifier.height(8.dp))
-        if (studyHide) {
+        if (preview) {
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(12.dp)) {
+                    Text(Lang.t("Preview", "معاينة"), style = MaterialTheme.typography.titleSmall)
+                    Spacer(Modifier.height(8.dp))
+                    body.lines().forEach { line ->
+                        when {
+                            line.startsWith("### ") -> Text(line.removePrefix("### "), style = MaterialTheme.typography.titleSmall)
+                            line.startsWith("## ") -> Text(line.removePrefix("## "), style = MaterialTheme.typography.titleMedium)
+                            line.startsWith("# ") -> Text(line.removePrefix("# "), style = MaterialTheme.typography.titleLarge)
+                            line.startsWith("- ") || line.startsWith("* ") -> Text("• " + line.drop(2), style = MaterialTheme.typography.bodyMedium)
+                            line.trim().startsWith("[[") && line.contains("]]") -> Text(line, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                            else -> Text(line.ifBlank { " " }, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                }
+            }
+        } else if (studyHide) {
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp)) {
                     Text(Lang.t("Study mode — answers hidden", "وضع مذاكرة"), style = MaterialTheme.typography.titleSmall)
@@ -159,7 +177,11 @@ fun NoteEditScreen(
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(
-                onClick = { studyHide = !studyHide },
+                onClick = { preview = !preview; if (preview) studyHide = false },
+                modifier = Modifier.weight(1f)
+            ) { Text(if (preview) Lang.t("Edit", "تعديل") else Lang.t("Preview", "معاينة")) }
+            OutlinedButton(
+                onClick = { studyHide = !studyHide; if (studyHide) preview = false },
                 modifier = Modifier.weight(1f)
             ) { Text(if (studyHide) Lang.t("Edit", "تعديل") else Lang.t("Study", "مذاكرة")) }
             OutlinedButton(

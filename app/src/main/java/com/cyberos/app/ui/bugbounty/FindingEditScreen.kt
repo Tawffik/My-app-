@@ -157,6 +157,15 @@ fun FindingEditScreen(
                     FindingNextAction.forStatus(status),
                     style = MaterialTheme.typography.bodyMedium
                 )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    Lang.t(
+                        "Only log findings on programs you are authorized to test.",
+                        "سجّل findings فقط على برامج مصرّح باختبارها."
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
         }
         Spacer(Modifier.height(8.dp))

@@ -52,6 +52,20 @@ fun BugBountyScreen(
             }
         }
         Spacer(Modifier.height(4.dp))
+        Card(
+            Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+        ) {
+            Text(
+                Lang.t(
+                    "Authorized scope only. AI suggestions = hypotheses until you verify.",
+                    "نطاق مصرّح فقط. اقتراحات AI فرضيات حتى تتحقق بنفسك."
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(10.dp)
+            )
+        }
+        Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(
                 selected = section == 0,

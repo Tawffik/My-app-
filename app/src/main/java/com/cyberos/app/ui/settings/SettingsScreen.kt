@@ -93,7 +93,7 @@ fun SettingsScreen(
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp)) {
                 Text("About", style = MaterialTheme.typography.titleMedium)
-                Text("CyberOS v1.0.38")
+                Text("CyberOS v1.1.0")
             }
         }
     }

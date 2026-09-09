@@ -57,6 +57,30 @@ fun ResearchScreen(state: ResearchState, onOpenItem: (Long) -> Unit) {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        Spacer(Modifier.height(6.dp))
+        Row(
+            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AssistChip(
+                onClick = { state.ensureCuratedLibrary() },
+                label = {
+                    Text(
+                        Lang.t(
+                            "Reload curated (${state.curatedCount()})",
+                            "إعادة المكتبة (${state.curatedCount()})"
+                        ),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            )
+            Text(
+                Lang.t("Offline library merges by URL", "المكتبة تندمج بالرابط"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
         if (state.lastSyncAt > 0L) {
             val ago = remember(state.lastSyncAt) {
                 val mins = ((System.currentTimeMillis() - state.lastSyncAt) / 60000L).toInt()

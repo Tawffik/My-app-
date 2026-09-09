@@ -35,6 +35,15 @@ class ResearchState(
         items = itemStore.all()
     }
 
+    /** Force re-merge curated writeups (safe; never deletes user items). */
+    fun ensureCuratedLibrary() {
+        try { itemStore.seedCuratedIfNeeded() } catch (_: Exception) {}
+        items = itemStore.all()
+    }
+
+    fun curatedCount(): Int =
+        items.count { it.tags.contains("curated") || it.author.contains("Curated", ignoreCase = true) }
+
     fun refresh() {
         items = itemStore.all()
         lastSyncAt = syncPrefs.lastSuccessAt()

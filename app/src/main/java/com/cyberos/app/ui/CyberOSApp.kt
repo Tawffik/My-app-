@@ -395,7 +395,8 @@ fun CyberOSApp() {
                             aiMode = 0
                             tab = 4
                         },
-                        onOpenNotes = { briefOpen = false; tab = 3 }
+                        onOpenNotes = { briefOpen = false; tab = 3 },
+                        onStartToday = { briefOpen = false; startTodayOpen = true }
                     )
                     tab == 1 -> LearningScreen(
                         progress = progressState,
