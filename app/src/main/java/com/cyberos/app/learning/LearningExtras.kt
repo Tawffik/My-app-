@@ -204,8 +204,6 @@ object LearningExtras {
                 flashcards = listOf("AI output is?" to "Hypothesis until you verify.")
             ),
             TopicData(
-                
-            TopicData(
                 id = "rm-cors-deep",
                 title = "CORS & SOP for hunters",
                 summary = "When CORS misconfig turns a browser into a cross-origin reader.",
@@ -254,7 +252,7 @@ object LearningExtras {
                     "PortSwigger SSRF" to "https://portswigger.net/web-security/ssrf"
                 )
             ),
-            
+            TopicData(
                 id = "rm-notes-system",
                 title = "Part 20–22 — Notes, explain-without-looking, weekly projects",
                 summary = "Professional study system: notes template, active recall, weekly builds.",
@@ -413,7 +411,7 @@ object LearningExtras {
                     "Blind IDOR?" to "Effect without direct data read in response."
                 )
             ),
-            
+            TopicData(
                 id = "ea-apply-loop",
                 title = "Apply loop: note → lab → report",
                 summary = "Turn each trick into a structured note and an authorized test checklist.",
