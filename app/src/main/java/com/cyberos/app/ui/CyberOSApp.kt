@@ -186,17 +186,13 @@ fun CyberOSApp() {
                             editingId = 0L; aiMode = 0; tab = 5
                         },
                         onGenerateCards = { t, b ->
-                            cardGenSource = "Title: $t
-
-$b"; editingId = 0L; cardGenOpen = true
+                            cardGenSource = "Title: $t\n\n$b"; editingId = 0L; cardGenOpen = true
                         },
                         onCreateLinkedNote = { linkTitle ->
                             notesState.upsert(
                                 -1L,
                                 linkTitle,
-                                "## Linked from another note
-
-",
+                                "## Linked from another note\n\n",
                                 listOf("linked"),
                                 folder = "Inbox",
                                 pinned = false
