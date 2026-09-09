@@ -13,11 +13,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.cyberos.app.data.BugBountyFilters
 import com.cyberos.app.data.ResearchItem
 import com.cyberos.app.data.ResearchState
+import com.cyberos.app.data.BrowserLauncher
 import com.cyberos.app.ui.EmptyState
 import com.cyberos.app.ui.lang.Lang
 import kotlinx.coroutines.launch
@@ -171,19 +173,30 @@ fun ResearchScreen(state: ResearchState, onOpenItem: (Long) -> Unit) {
 
 @Composable
 private fun ResearchCard(item: ResearchItem, onOpen: () -> Unit, onBookmark: () -> Unit) {
+    val context = LocalContext.current
     val dateText = remember(item.publishedAt) {
         if (item.publishedAt <= 0L) ""
-        else SimpleDateFormat("d MMM", Locale.getDefault()).format(Date(item.publishedAt))
+        else SimpleDateFormat("d MMM yyyy", Locale.getDefault()).format(Date(item.publishedAt))
+    }
+    val host = remember(item.link) {
+        try {
+            if (item.link.startsWith("http")) {
+                val u = item.link.removePrefix("https://").removePrefix("http://")
+                u.substringBefore("/").substringBefore("?")
+            } else ""
+        } catch (_: Exception) { "" }
     }
     Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.clickable(onClick = onOpen).padding(14.dp)) {
+        Column(Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     item.title.ifBlank { "Untitled" },
                     style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
+                    maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(onClick = onOpen)
                 )
                 IconButton(onClick = onBookmark) {
                     Icon(
@@ -197,14 +210,42 @@ private fun ResearchCard(item: ResearchItem, onOpen: () -> Unit, onBookmark: () 
                     )
                 }
             }
-            if (item.summary.isNotBlank()) {
-                Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(6.dp))
+            Text(
+                item.summary.ifBlank {
+                    Lang.t(
+                        "No summary stored — open the article for full details.",
+                        "مفيش ملخص محفوظ — افتح المقال للتفاصيل الكاملة."
+                    )
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.clickable(onClick = onOpen)
+            )
+            if (item.link.isNotBlank()) {
+                Spacer(Modifier.height(6.dp))
                 Text(
-                    item.summary,
-                    style = MaterialTheme.typography.bodySmall,
+                    host.ifBlank { item.link },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    item.link,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
+                )
+            } else {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    Lang.t("Missing link", "اللينك ناقص"),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
                 )
             }
             Spacer(Modifier.height(8.dp))
@@ -212,11 +253,13 @@ private fun ResearchCard(item: ResearchItem, onOpen: () -> Unit, onBookmark: () 
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                AssistChip(
-                    onClick = {},
-                    enabled = false,
-                    label = { Text(item.category, style = MaterialTheme.typography.labelSmall) }
-                )
+                if (item.category.isNotBlank()) {
+                    AssistChip(
+                        onClick = {},
+                        enabled = false,
+                        label = { Text(item.category, style = MaterialTheme.typography.labelSmall) }
+                    )
+                }
                 if (item.vulnerabilityType.isNotBlank() && item.vulnerabilityType != "Other") {
                     AssistChip(
                         onClick = {},
@@ -233,6 +276,22 @@ private fun ResearchCard(item: ResearchItem, onOpen: () -> Unit, onBookmark: () 
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = onOpen, modifier = Modifier.weight(1f)) {
+                    Text(Lang.t("Details", "تفاصيل"))
+                }
+                Button(
+                    onClick = {
+                        if (item.link.isNotBlank()) BrowserLauncher.open(context, item.link)
+                        else onOpen()
+                    },
+                    modifier = Modifier.weight(1f),
+                    enabled = item.link.isNotBlank()
+                ) {
+                    Text(Lang.t("Open link", "افتح اللينك"))
                 }
             }
         }

@@ -103,8 +103,28 @@ class ResearchItemStore(context: Context) {
                 )
             )
         }
-        if (toAdd.isEmpty()) return
-        cache.addAll(toAdd)
+        // Refresh weak existing curated rows (title-only / empty summary or link)
+        val byLink = CuratedWriteupLibrary.WRITEUPS.associateBy { it.link.trim().lowercase() }
+        var updated = false
+        for (i in cache.indices) {
+            val item = cache[i]
+            val key = item.link.trim().lowercase()
+            val entry = byLink[key] ?: continue
+            val weak = item.summary.isBlank() || item.summary.length < 12 || item.link.isBlank()
+            if (weak || item.author.isBlank()) {
+                cache[i] = item.copy(
+                    title = entry.title.ifBlank { item.title },
+                    link = entry.link.ifBlank { item.link },
+                    summary = entry.summary.ifBlank { item.summary },
+                    author = if (item.author.isBlank()) "CyberOS Curated" else item.author,
+                    category = entry.category.ifBlank { item.category },
+                    tags = (item.tags + entry.tags + listOf("writeup", "curated")).distinct()
+                )
+                updated = true
+            }
+        }
+        if (toAdd.isEmpty() && !updated) return
+        if (toAdd.isNotEmpty()) cache.addAll(toAdd)
         while (cache.size > 1200) cache.removeAt(0)
         persist()
     }

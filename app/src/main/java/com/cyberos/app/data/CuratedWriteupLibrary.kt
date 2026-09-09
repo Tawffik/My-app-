@@ -24,21 +24,21 @@ object CuratedWriteupLibrary {
             "https://blog.trailofbits.com/2025/10/22/prompt-injection-to-rce-in-ai-agents/",
             "AI Security",
             listOf("writeup", "ai", "prompt-injection", "rce"),
-            "Curated — AI agent injection paths to code execution."
+            "Trail of Bits research: how prompt injection against agents can reach RCE. Read impact path, then note one defensive control. Link opens full article."
         ),
         Entry(
             "EchoLeak — AIM Labs",
             "https://www.aim.security/aim-labs/aim-labs-echoleak-blogpost",
             "AI Security",
             listOf("writeup", "ai", "prompt-injection"),
-            "Curated — LLM data leakage research."
+            "AIM Labs EchoLeak: LLM-assisted data leakage patterns. Study the chain, capture takeaways in a study note. Full writeup via Open link."
         ),
         Entry(
             "Google Bard data exfiltration (Embrace The Red)",
             "https://embracethered.com/blog/posts/2023/google-bard-data-exfiltration/",
             "AI Security",
             listOf("writeup", "ai", "data-exfiltration", "prompt-injection"),
-            "Curated — classic LLM exfil via markdown/CSP gaps."
+            "Embrace The Red: Bard/markdown exfiltration patterns. Map to CSP and output handling. Open the link for PoC discussion."
         ),
         Entry(
             "Google AI Studio mass data exfil",
@@ -436,7 +436,7 @@ object CuratedWriteupLibrary {
             "https://www.aim.security/aim-labs/aim-labs-echoleak-blogpost",
             "AI Security",
             listOf("writeup", "ai", "prompt-injection"),
-            "Curated — LLM data leakage research."
+            "AIM Labs EchoLeak: LLM-assisted data leakage patterns. Study the chain, capture takeaways in a study note. Full writeup via Open link."
         ),
         Entry(
             "Prompt injection to RCE in AI agents (Trail of Bits)",

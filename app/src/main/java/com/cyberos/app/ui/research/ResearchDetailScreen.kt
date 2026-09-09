@@ -60,6 +60,15 @@ fun ResearchDetailScreen(state: ResearchState, id: Long, onBack: () -> Unit, onA
                 AssistChip(onClick = {}, enabled = false, label = { Text(item.vulnerabilityType) })
             }
         }
+        if (item.link.isNotBlank()) {
+            Text(
+                item.link,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                maxLines = 3
+            )
+            Spacer(Modifier.height(8.dp))
+        }
         if (item.author.isNotBlank()) {
             Spacer(Modifier.height(4.dp))
             Text(
