@@ -1,4 +1,3 @@
-import com.cyberos.app.data.FindingNextAction
 package com.cyberos.app.ui.bugbounty
 
 import androidx.compose.foundation.layout.*
@@ -21,6 +20,7 @@ import com.cyberos.app.data.BugBountyFinding
 import com.cyberos.app.data.BugBountyState
 import com.cyberos.app.data.FindingSeverities
 import com.cyberos.app.data.FindingStatuses
+import com.cyberos.app.data.FindingNextAction
 import com.cyberos.app.ui.lang.Lang
 
 @OptIn(ExperimentalMaterial3Api::class)
