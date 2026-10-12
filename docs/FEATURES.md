@@ -22,6 +22,8 @@ Complete inventory of shipped capabilities (v1.1.0). Useful for README readers, 
 - [x] Common Vulnerabilities path
 - [x] Android Security path
 - [x] AI Security path (OWASP LLM-oriented topics)
+- [x] AI & Agent Study Lab path (6-week plan, MCP, lab method, PortSwigger/OWASP resources)
+- [x] MCP & tool-poisoning + lab evidence topics in AI Security path
 - [x] Web Security Bug Bounty Roadmap path
 - [x] Access Control & IDOR Tricks path
 - [x] Study OS path
