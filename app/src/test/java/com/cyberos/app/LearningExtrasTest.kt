@@ -8,11 +8,12 @@ import org.junit.Test
 class LearningExtrasTest {
     @Test
     fun extras_paths_present() {
-        assertTrue(LearningExtras.paths.size >= 3)
+        assertTrue(LearningExtras.paths.size >= 4)
         val ids = LearningExtras.paths.map { it.id }.toSet()
         assertTrue(ids.contains("web-bb-roadmap"))
         assertTrue(ids.contains("elite-access-tricks"))
         assertTrue(ids.contains("study-os"))
+        assertTrue(ids.contains("ai-agent-study-lab"))
     }
 
     @Test
@@ -22,5 +23,7 @@ class LearningExtrasTest {
         assertNotNull(CyberCurriculum.findTopic("rm-web-fundamentals"))
         assertNotNull(CyberCurriculum.findTopic("ea-hpp"))
         assertNotNull(CyberCurriculum.findTopic("http-fundamentals"))
+        assertNotNull(CyberCurriculum.findTopic("aas-w1-architecture"))
+        assertNotNull(CyberCurriculum.findTopic("mcp-security"))
     }
 }
