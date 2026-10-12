@@ -559,26 +559,25 @@ object CyberCurriculum {
                     resources = listOf(
                         "Study lab repo" to "https://github.com/Tawffik/ai-agent-security-study"
                     )
-
                 ),
                 TopicData(
                     id = "mcp-security", title = "MCP & Tool Poisoning",
                     summary = "Model Context Protocol trust gaps: tool descriptions and responses as injection channels.",
                     sections = listOf(
-                        TopicSection("What it is", "MCP connects agents to external tools/resources. Clients often trust tool names, descriptions, and schemas — and may feed tool responses into the model context."),
-                        TopicSection("Why it matters", "Tool poisoning embeds instructions in metadata or responses. That is indirect prompt injection at the tool boundary — not proof that MCP itself is a CVE."),
+                        TopicSection("What it is", "MCP connects agents to external tools and resources. Clients often trust tool names, descriptions, and schemas, and may feed tool responses into the model context."),
+                        TopicSection("Why it matters", "Tool poisoning embeds instructions in metadata or responses. That is indirect prompt injection at the tool boundary, not proof that MCP itself is always a CVE."),
                         TopicSection("Hands-on", "Read MCP security best practices. On systems you own, review which tools an agent can call and whether descriptions are treated as trusted instructions."),
-                        TopicSection("Controls", "Allowlist servers/tools, least privilege credentials, human approval for high-impact tools, never treat tool text as system policy."),
+                        TopicSection("Controls", "Allowlist servers and tools, least privilege credentials, human approval for high-impact tools, never treat tool text as system policy."),
                         TopicSection("Takeaways", "Investigate insecure implementations and trust relationships. Prefer inspectable, controllable agent runtimes.")
                     ),
                     related = listOf("agent-security", "prompt-injection"),
                     flashcards = listOf(
-                        "MCP tool poisoning?" to "Malicious instructions in tool description/schema/response trusted by the agent.",
-                        "Primary MCP control?" to "Least privilege tools + verify servers + runtime policy on actions."
+                        "MCP tool poisoning?" to "Malicious instructions in tool description, schema, or response trusted by the agent.",
+                        "Primary MCP control?" to "Least privilege tools, verify servers, runtime policy on actions."
                     ),
                     quiz = listOf(
-                        QuizQuestion("Tool poisoning mainly abuses:", listOf("TLS certificates only", "Trust in tool metadata/responses", "Disk encryption", "GPU drivers"), 1, "Descriptions and responses enter model context."),
-                        QuizQuestion("MCP protocol equals a vulnerability?", listOf("Always", "Never — focus on insecure deployments and trust", "Only on Android", "Only offline"), 1, "Protocol design risks exist; impact depends on implementation and policy.")
+                        QuizQuestion("Tool poisoning mainly abuses:", listOf("TLS certificates only", "Trust in tool metadata or responses", "Disk encryption", "GPU drivers"), 1, "Descriptions and responses enter model context."),
+                        QuizQuestion("MCP protocol equals a vulnerability?", listOf("Always", "No - focus on insecure deployments and trust", "Only on Android", "Only offline"), 1, "Impact depends on implementation and policy.")
                     ),
                     resources = listOf(
                         "MCP security best practices" to "https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security-best-practices",
@@ -588,30 +587,32 @@ object CyberCurriculum {
                 ),
                 TopicData(
                     id = "ai-lab-method", title = "Lab Method & Evidence",
-                    summary = "Recon → Hypothesis → Experiment → Evidence — never equate model obedience with a reportable bug.",
+                    summary = "Hypothesis before experiment. Do not equate model obedience with a reportable bug.",
                     sections = listOf(
-                        TopicSection("Loop", "Recon → Context → Hypothesis → Experiment → Evidence → Decision. Write the hypothesis before testing."),
-                        TopicSection("Impact bar", "A model following a malicious instruction is not automatically reportable. Need a crossed trust boundary and real impact (confidentiality, integrity, authorization, or actions)."),
-                        TopicSection("Labs only", "Use PortSwigger Web LLM labs, local toys, or explicitly authorized systems. No third-party production without permission."),
+                        TopicSection("Loop", "Recon, Context, Hypothesis, Experiment, Evidence, Decision. Write the hypothesis before testing."),
+                        TopicSection("Impact bar", "A model following a malicious instruction is not automatically reportable. Need a crossed trust boundary and real impact."),
+                        TopicSection("Labs only", "Use PortSwigger Web LLM labs, local toys, or explicitly authorized systems."),
                         TopicSection("Artifacts", "Save data-flow diagrams, negative results, and a minimal regression idea after any defense."),
                         TopicSection("Takeaways", "Prefer one strong evidence chain over many noisy prompts.")
                     ),
                     related = listOf("prompt-injection", "ai-for-bug-bounty"),
                     flashcards = listOf(
-                        "Reportable bar?" to "Trust boundary + measurable security impact, not only jailbreak text.",
+                        "Reportable bar?" to "Trust boundary plus measurable security impact, not only jailbreak text.",
                         "Where to practice?" to "PortSwigger LLM labs or owned local apps only."
                     ),
                     quiz = listOf(
                         QuizQuestion("Jailbreak alone is:", listOf("Always a P1 bounty", "Not necessarily an application vulnerability", "Proof of RCE", "A TLS issue"), 1, "Need application boundary and impact."),
-                        QuizQuestion("Best practice surface for LLM web labs:", listOf("Random production banks", "PortSwigger Web Security Academy LLM path", "Friends' WhatsApp", "Unscoped scanners"), 1, "Authorized training labs.")
+                        QuizQuestion("Best practice surface for LLM web labs:", listOf("Random production banks", "PortSwigger Web Security Academy LLM path", "Friends WhatsApp", "Unscoped scanners"), 1, "Authorized training labs.")
                     ),
                     resources = listOf(
                         "PortSwigger LLM learning path" to "https://portswigger.net/web-security/learning-paths/llm-attacks",
                         "Study lab repo" to "https://github.com/Tawffik/ai-agent-security-study",
-                        "garak (LLM scanner)" to "https://github.com/NVIDIA/garak"
+                        "garak LLM scanner" to "https://github.com/NVIDIA/garak"
                     )
                 )
             )
+        )
+
     )
 
     /** Runtime user paths from CustomPathStore — set on app start / after edit. */
