@@ -5,7 +5,8 @@ object LearningExtras {
     val paths: List<PathData> = listOf(
         webRoadmapPath().let { it.copy(topics = it.topics + LearningExtrasMore.extraTopicsForRoadmap()) },
         eliteAccessPath().let { it.copy(topics = it.topics + LearningExtrasMore.extraTopicsForElite()) },
-        studyMethodPath()
+        studyMethodPath(),
+        agentStudyLabPath()
     )
 
     private fun sec(heading: String, body: String) = TopicSection(heading, body)
@@ -123,6 +124,132 @@ object LearningExtras {
                 listOf(sec("Rule", "Rewrite in your words.")),
                 listOf("rm-web-fundamentals"), listOf("Active reading?" to "Rewrite immediately"),
                 resources = listOf("BugBountyDaily" to "https://bugbountydaily.com/"))
+        )
+    )
+
+    /** Six-week AI & Agent Security Study Lab — mobile notebook + resources. Users can still add more via "Add my section". */
+    private fun agentStudyLabPath() = PathData(
+        id = "ai-agent-study-lab",
+        title = "AI & Agent Study Lab",
+        description = "LLM apps → injection → RAG → tools/agents → MCP → evidence. Authorized labs only. Extensible via custom sections.",
+        topics = listOf(
+            TopicData(
+                "aas-w1-architecture", "Week 1 — App architecture & threat model",
+                "Model vs application security; trust boundaries; diagnostic.",
+                listOf(
+                    sec("Goal", "Draw user → API → LLM → tools with trust boundaries."),
+                    sec("Rule", "Prompt wording alone is not a security boundary."),
+                    sec("Diagnostic", "Use in-app progress: comfortable with HTTP/authz before deep labs.")
+                ),
+                listOf("llm-basics", "aas-w2-injection"),
+                listOf("Trust boundary?" to "Where trust level changes between components."),
+                listOf(q("Primary failure mode of LLM apps?", listOf("Only GPU heat", "Mixing instructions and data / over-trusted tools", "Too much RAM", "Dark mode"), 1, "Data treated as instructions or excessive agency.")),
+                resources = listOf(
+                    "Study plan (repo)" to "https://github.com/Tawffik/ai-agent-security-study/blob/main/STUDY_PLAN.md",
+                    "OWASP LLM Top 10 2026" to "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/"
+                )
+            ),
+            TopicData(
+                "aas-w2-injection", "Week 2 — Direct & indirect injection",
+                "Impact validation on authorized labs.",
+                listOf(
+                    sec("Direct", "Attacker types into the chat box."),
+                    sec("Indirect", "Instructions in retrieved pages, tickets, or docs."),
+                    sec("Impact", "Need crossed trust boundary + real effect — not jailbreak text alone.")
+                ),
+                listOf("prompt-injection", "aas-w3-rag"),
+                listOf("Direct vs indirect?" to "Chat vs retrieved/third-party content."),
+                listOf(q("Indirect injection often rides on:", listOf("BGP only", "RAG / email / web content", "Battery", "Font files"), 1, "Untrusted content enters context.")),
+                resources = listOf(
+                    "PortSwigger LLM path" to "https://portswigger.net/web-security/learning-paths/llm-attacks",
+                    "Excessive agency lab" to "https://portswigger.net/web-security/llm-attacks/lab-exploiting-llm-apis-with-excessive-agency",
+                    "Indirect injection lab" to "https://portswigger.net/web-security/llm-attacks/lab-indirect-prompt-injection",
+                    "IPI paper" to "https://arxiv.org/abs/2302.12173"
+                )
+            ),
+            TopicData(
+                "aas-w3-rag", "Week 3 — RAG & isolation",
+                "Retrieval pipeline, tenant isolation, poisoned documents.",
+                listOf(
+                    sec("Pipeline", "Ingest → chunk → embed → retrieve → generate."),
+                    sec("Isolation", "Cross-user retrieval is a confidentiality failure."),
+                    sec("Poison", "Hostile documents are data that can act like instructions.")
+                ),
+                listOf("rag-security", "aas-w4-tools"),
+                listOf("RAG chunks are?" to "Untrusted data until authorized and validated."),
+                listOf(q("Cross-tenant retrieval primarily hits:", listOf("Color contrast", "Confidentiality / authorization", "Bluetooth", "DNSSEC"), 1, "Wrong user data in context.")),
+                resources = listOf(
+                    "OWASP LLM Top 10 2026" to "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/"
+                )
+            ),
+            TopicData(
+                "aas-w4-tools", "Week 4 — Tools, agency, chains",
+                "Least privilege tools; confused deputy; multi-step impact.",
+                listOf(
+                    sec("Agency", "Grant minimum tools and arguments for the task."),
+                    sec("Deputy", "Privileged service acting on untrusted instructions."),
+                    sec("Chains", "LLM step → classic vuln (SQLi, SSRF, command injection) via tools.")
+                ),
+                listOf("agent-security", "aas-w5-mcp"),
+                listOf("Least agency?" to "Minimum autonomy and tool power required."),
+                listOf(q("High-impact tool calls should require:", listOf("More emojis", "Server-side authz and often human approval", "Only client JS checks", "Larger font"), 1, "Server must enforce authorization.")),
+                resources = listOf(
+                    "LLM APIs vuln lab" to "https://portswigger.net/web-security/llm-attacks/lab-exploiting-vulnerabilities-in-llm-apis",
+                    "Agentic Top 10 (OWASP)" to "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+                )
+            ),
+            TopicData(
+                "aas-w5-mcp", "Week 5 — MCP, memory, output handling",
+                "Tool poisoning, hidden context, unsafe rendering.",
+                listOf(
+                    sec("MCP", "Tool descriptions/responses can inject instructions."),
+                    sec("Memory", "Poisoned long-term context steers later sessions."),
+                    sec("Output", "Model HTML/JS in a web UI can become XSS.")
+                ),
+                listOf("mcp-security", "aas-w6-capstone"),
+                listOf("Tool poisoning?" to "Hostile text in tool metadata or responses."),
+                listOf(q("Raw model HTML in a page risks:", listOf("Only slow CSS", "XSS / content injection", "Stronger TLS", "Airplane mode"), 1, "Encode and validate outputs.")),
+                resources = listOf(
+                    "MCP security practices" to "https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security-best-practices",
+                    "OWASP MCP Tool Poisoning" to "https://owasp.org/www-community/attacks/MCP_Tool_Poisoning",
+                    "Output handling lab" to "https://portswigger.net/web-security/llm-attacks/lab-exploiting-insecure-output-handling-in-llms",
+                    "Agent Control Standard" to "https://genai.owasp.org/resource/agent-control-standard-acs/"
+                )
+            ),
+            TopicData(
+                "aas-w6-capstone", "Week 6 — Research skills & capstone",
+                "Read papers critically; optional garak; write evidence-based report.",
+                listOf(
+                    sec("Paper", "Question, threat model, method, limits — not marketing."),
+                    sec("Capstone", "Local mock agent in study repo: safe vs unsafe modes."),
+                    sec("Report", "Attack surface, boundary, chain, proof, impact, remediation.")
+                ),
+                listOf("ai-lab-method", "ai-for-bug-bounty"),
+                listOf("AI claim status?" to "Hypothesis until you reproduce."),
+                listOf(q("Before using AI text in a bounty report:", listOf("Submit immediately", "Manually verify impact and stay in scope", "Only change fonts", "Disable logging"), 1, "Human verification is mandatory.")),
+                resources = listOf(
+                    "Capstone + curriculum repo" to "https://github.com/Tawffik/ai-agent-security-study",
+                    "garak" to "https://github.com/NVIDIA/garak",
+                    "Glossary" to "https://github.com/Tawffik/ai-agent-security-study/blob/main/GLOSSARY.md"
+                )
+            ),
+            TopicData(
+                "aas-add-modules", "How to add any new module",
+                "Use Add my section on Learn, or extend this path in code.",
+                listOf(
+                    sec("In the app", "Learn → Add my section → title/description → add topics with optional Source URL (opens in Custom Tabs)."),
+                    sec("In code", "Append PathData to LearningExtras or topics under CyberCurriculum; keep unique topic ids."),
+                    sec("Notebook", "Mirror progress in Notes vault or the study repo PROGRESS.md."),
+                    sec("Ethics", "Only authorized labs and owned systems.")
+                ),
+                listOf("aas-w1-architecture", "study-sources"),
+                listOf("Custom path store?" to "Persists user paths in app private JSON."),
+                listOf(q("Custom topic Source URL opens in:", listOf("Silent root shell", "Custom Tabs / browser", "SMS", "GPU"), 1, "resources are opened as study links.")),
+                resources = listOf(
+                    "CyberOS repo" to "https://github.com/Tawffik/My-app-",
+                    "Study lab repo" to "https://github.com/Tawffik/ai-agent-security-study"
+                )
+            )
         )
     )
 }
