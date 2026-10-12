@@ -53,6 +53,7 @@ Built-in paths (additive; users can add custom sections):
 | **Common Vulnerabilities** | SQLi, XSS, CSRF, SSRF, business logic |
 | **Android Security** | APK, manifest, components, WebView |
 | **AI Security** | LLM apps, prompt injection, RAG, agents, output handling, AI for bug bounty |
+| **AI & Agent Study Lab** | 6-week LLM/agent curriculum, MCP, PortSwigger labs, add-your-module |
 | **Web Security BB Roadmap** | Fundamentals → JS/DOM → APIs → authz → Burp → workflow → notes system |
 | **Access Control & IDOR Tricks** | Encoding, HPP, type spoofing, path/body authority, JSON quirks |
 | **Study OS** | Daily ritual, notes that force application, open sources while studying |
