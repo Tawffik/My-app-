@@ -612,8 +612,7 @@ object CyberCurriculum {
                     )
                 )
             )
-        )
-
+    )
 
     /** Runtime user paths from CustomPathStore — set on app start / after edit. */
     @Volatile
